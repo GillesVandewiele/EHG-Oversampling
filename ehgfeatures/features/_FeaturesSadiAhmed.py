@@ -1,11 +1,11 @@
 import numpy as np
 import scipy
 
-from ehgfeatures.features import EMDDecomposition
+from ehgfeatures.features import EMDDecomposition, FeatureBase
 
 __all__=['FeaturesSadiAhmed']
 
-class FeaturesSadiAhmed:
+class FeaturesSadiAhmed(FeatureBase):
     """
     Based on:
 
@@ -19,11 +19,16 @@ class FeaturesSadiAhmed:
                 journal = {Journal of Medical Systems},
                 doi = {10.1007/s10916-017-0847-8}
                 }
+    
+    number of features according to paper: 7 features extracted from 2 EMD functions: 14
     """
 
     def __init__(self, imfs= [3, 6], sampling_frequency= 20.0):
         self.imfs= imfs
         self.sampling_frequency= sampling_frequency
+
+    def n_features(self):
+        return 7*len(self.imfs)
 
     def extract(self, signal):
         emds= EMDDecomposition(n_levels= max(self.imfs)+1).extract(signal)

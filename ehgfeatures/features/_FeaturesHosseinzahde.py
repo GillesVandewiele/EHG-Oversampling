@@ -1,9 +1,9 @@
 import logging
 
-from ehgfeatures.features import Feature_AR_Yule_Walker
-from ehgfeatures.features import EMDDecomposition, WPDDecomposition
+from ehgfeatures.features import FeatureAR_Yule_Walker
+from ehgfeatures.features import EMDDecomposition, WPDDecomposition, FeatureBase
 
-class FeaturesHosseinzahde:
+class FeaturesHosseinzahde(FeatureBase):
     """
     Based on
 
@@ -14,14 +14,19 @@ class FeaturesHosseinzahde:
                 year={2018},
                 pages={1477-1481}
                 }
+    
+    number of features according to the paper: 360
     """
     
     def __init__(self, n_ar_features= 10, n_emd_levels= 6, n_wavelet_levels= 6, wavelet='db8'):
         self.n_emd_levels= n_emd_levels
         self.n_wavelet_levels= n_wavelet_levels
         self.wavelet= wavelet
-        self.features= [Feature_AR_Yule_Walker(n_features= n_ar_features)]
+        self.features= [FeatureAR_Yule_Walker(n_features= n_ar_features)]
     
+    def n_features(self):
+        return self.n_emd_levels*self.n_wavelet_levels*(self.features[0].n_features())
+
     def extract(self, signal):
         emds= EMDDecomposition(n_levels= self.n_emd_levels).extract(signal)
         emd_wpds= {}

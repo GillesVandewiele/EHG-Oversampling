@@ -8,13 +8,14 @@ import entropy
 
 import logging
 
-from ._BaseFeatures import (Feature_FractalDimensionHiguchi, Feature_InterquartileRange, Feature_MeanAbsoluteDeviation,
-                            Feature_MeanEnergy, Feature_TeagerKaiserEnergy, Feature_SampleEntropy, Feature_StandardDeviation)
+from ._BaseFeatures import (FeatureFractalDimensionHigushi, FeatureInterquartileRange, FeatureMeanAbsoluteDeviation,
+                            FeatureMeanEnergy, FeatureTeagerKaiserEnergy, FeatureSampleEntropy, FeatureStandardDeviation,
+                            FeatureBase)
 from ._Decomposition import EMDDecomposition, WPDDecomposition
 
 __all__= ['FeaturesAcharya']
 
-class FeaturesAcharya:
+class FeaturesAcharya(FeatureBase):
     """
     Features according to
 
@@ -34,26 +35,32 @@ class FeaturesAcharya:
         2) I have no idea how they compute "Fuzzy Entropy", they do not cite it. As a fuzzy technique, Fuzzy entropy needs some sort of a membership function
             but there is no clue on it.
         3) How to treat the three channels? From the paper it seems that they use only one.
-    """
-    def __init__(self, wavelet='db8', n_levels=6):
-        self.wavelet= wavelet
-        self.n_levels= n_levels
-
-        self.features= [Feature_FractalDimensionHiguchi(), 
-                    Feature_InterquartileRange(), 
-                    Feature_MeanAbsoluteDeviation(), 
-                    Feature_MeanEnergy(), 
-                    Feature_TeagerKaiserEnergy(), 
-                    Feature_SampleEntropy(), 
-                    Feature_StandardDeviation()]
     
+    Number of features according to the paper: 1056, but fuzzy entropy is not implemented, therefore 7*11*12 = 924
+    """
+    def __init__(self, wavelet='db8', n_emd_levels= 11, n_wavelet_levels=6):
+        self.wavelet= wavelet
+        self.n_emd_levels= n_emd_levels
+        self.n_wavelet_levels= n_wavelet_levels
+
+        self.features= [FeatureFractalDimensionHigushi(), 
+                    FeatureInterquartileRange(), 
+                    FeatureMeanAbsoluteDeviation(), 
+                    FeatureMeanEnergy(), 
+                    FeatureTeagerKaiserEnergy(), 
+                    FeatureSampleEntropy(), 
+                    FeatureStandardDeviation()]
+    
+    def n_features(self):
+        return self.n_emd_levels*self.n_wavelet_levels*2*len(self.features)
+
     def extract(self, signal):
         logging.info("extracting %s" % self.__class__.__name__)
 
-        emds= EMDDecomposition().extract(signal)
+        emds= EMDDecomposition(n_levels=self.n_emd_levels).extract(signal)
         emd_wpds= {}
         for e in emds:
-            wpds= WPDDecomposition(wavelet=self.wavelet, n_levels= self.n_levels).extract(emds[e])
+            wpds= WPDDecomposition(wavelet=self.wavelet, n_levels= self.n_wavelet_levels, detail_levels_to_n=True).extract(emds[e])
             for w in wpds:
                 emd_wpds[w + '_' + e]= wpds[w]
         

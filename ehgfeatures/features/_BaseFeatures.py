@@ -10,8 +10,22 @@ import logging
 
 import statsmodels.api
 
-__all__= ['Feature_FractalDimensionHiguchi', 'Feature_InterquartileRange', 'Feature_MeanAbsoluteDeviation', 'Feature_MeanEnergy',
-            'Feature_TeagerKaiserEnergy', 'Feature_SampleEntropy', 'Feature_StandardDeviation', 'Feature_DFA', 'Feature_AR_Yule_Walker']
+import scipy.signal as ss
+
+__all__= ['FeatureFractalDimensionHigushi', 
+            'FeatureInterquartileRange', 
+            'FeatureMeanAbsoluteDeviation', 
+            'FeatureMeanEnergy',
+            'FeatureTeagerKaiserEnergy', 
+            'FeatureSampleEntropy', 
+            'FeatureStandardDeviation', 
+            'FeatureDFA', 
+            'FeatureAR_Yule_Walker',
+            'FeatureBase']
+
+class FeatureBase:
+    def n_features(self):
+        return 0
 
 def gen_nleo(x, l=1, p=2, q=0, s=3):
     N = len(x)
@@ -72,7 +86,10 @@ def specific_nleo(x, type='teager'):
     x_nleo = get_nleo(type)
     return(x_nleo)
 
-class Feature_FractalDimensionHiguchi:
+class FeatureFractalDimensionHigushi(FeatureBase):
+    def n_features(self):
+        return 1
+
     def extract(self, signal):
         logging.info("extracting %s" % self.__class__.__name__)
         return {self.__class__.__name__: neurokit.complexity(signal, 
@@ -91,41 +108,55 @@ class Feature_FractalDimensionHiguchi:
                         lyap_e=False, 
                         emb_dim=2)['Fractal_Dimension_Higushi']}
 
-class Feature_InterquartileRange:
+class FeatureInterquartileRange(FeatureBase):
+    def n_features(self):
+        return 1
+
     def extract(self, signal):
         logging.info("extracting %s" % self.__class__.__name__)
         return {self.__class__.__name__: scipy.stats.iqr(signal)}
 
-class Feature_MeanAbsoluteDeviation:
+class FeatureMeanAbsoluteDeviation(FeatureBase):
+    def n_features(self):
+        return 1
+
     def extract(self, signal):
         logging.info("extracting %s" % self.__class__.__name__)
         return {self.__class__.__name__: np.mean(np.abs(signal - np.mean(signal)))}
 
-class Feature_MeanEnergy:
+class FeatureMeanEnergy(FeatureBase):
+    def n_features(self):
+        return 1
+
     def extract(self, signal):
         logging.info("extracting %s" % self.__class__.__name__)
         return {self.__class__.__name__: np.mean(signal*signal)}
 
-class Feature_TeagerKaiserEnergy:
+class FeatureTeagerKaiserEnergy(FeatureBase):
+    def n_features(self):
+        return 1
+
     def extract(self, signal):
         logging.info("extracting %s" % self.__class__.__name__)
         nleo= specific_nleo(signal)
         result= np.mean(nleo*nleo)
         return {self.__class__.__name__: result}
 
-class Feature_SampleEntropy:
+class FeatureSampleEntropy(FeatureBase):
+    def n_features(self):
+        return 1
+
     def extract(self, signal):
         logging.info("extracting %s" % self.__class__.__name__)
         return {self.__class__.__name__: entropy.sample_entropy(signal, order=2, metric="chebyshev")}
 
-class Feature_StandardDeviation:
+class FeatureStandardDeviation(FeatureBase):
+    def n_features(self):
+        return 1
+
     def extract(self, signal):
         logging.info("extracting %s" % self.__class__.__name__)
         return {self.__class__.__name__: np.std(signal)}
-
-import numpy as np
-import matplotlib.pyplot as plt
-import scipy.signal as ss
 
 # detrended fluctuation analysis
 
@@ -197,20 +228,28 @@ def dfa(x, scale_lim=[5,9], scale_dens=0.25, show=False):
         fluct[e] = np.sqrt(np.mean(calc_rms(y, sc)**2))
     # fitting a line to rms data
     coeff = np.polyfit(np.log2(scales), np.log2(fluct), 1)
-    if show:
-        fluctfit = 2**np.polyval(coeff,np.log2(scales))
-        plt.loglog(scales, fluct, 'bo')
-        plt.loglog(scales, fluctfit, 'r', label=r'$\alpha$ = %0.2f'%coeff[0])
-        plt.title('DFA')
-        plt.xlabel(r'$\log_{10}$(time window)')
-        plt.ylabel(r'$\log_{10}$<F(t)>')
-        plt.legend()
-        plt.show()
+    #if show:
+    #    fluctfit = 2**np.polyval(coeff,np.log2(scales))
+    #    plt.loglog(scales, fluct, 'bo')
+    #    plt.loglog(scales, fluctfit, 'r', label=r'$\alpha$ = %0.2f'%coeff[0])
+    #    plt.title('DFA')
+    #    plt.xlabel(r'$\log_{10}$(time window)')
+    #    plt.ylabel(r'$\log_{10}$<F(t)>')
+    #    plt.legend()
+    #    plt.show()
     return scales, fluct, coeff[0]
 
-class Feature_DFA:
-    def __init__(self, return_fluctuations= False):
+class FeatureDFA(FeatureBase):
+    def __init__(self,  scale_lim=[5,9], scale_dens=0.25, return_fluctuations= False):
+        self.scale_lim= scale_lim
+        self.scale_dens= scale_dens
         self.return_fluctuations= return_fluctuations
+
+    def n_features(self):
+        if not self.return_fluctuations:
+            return 1
+        else:
+            return 1 + int((self.scale_lim[1] - self.scale_lim[0])/self.scale_dens)
 
     def extract(self, signal):
         logging.info("extracting %s" % self.__class__.__name__)
@@ -224,13 +263,16 @@ class Feature_DFA:
                 results[self.__class__.__name__ + '_' + 'fluctuation_' + str(i)]= f
             return results
 
-class Feature_AR_Yule_Walker:
+class FeatureAR_Yule_Walker(FeatureBase):
     def __init__(self, n_features=10):
-        self.n_features= n_features
+        self.n_features_= n_features
     
+    def n_features(self):
+        return self.n_features_
+
     def extract(self, signal):
         logging.info("extracting %s" % self.__class__.__name__)
-        rho, _= statsmodels.api.regression.yule_walker(signal, order=self.n_features, method="mle")
+        rho, _= statsmodels.api.regression.yule_walker(signal, order=self.n_features_, method="mle")
         results= {}
         for i, r in enumerate(rho):
             results[self.__class__.__name__ + '_' + str(i)]= r

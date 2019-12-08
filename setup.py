@@ -39,6 +39,7 @@ PYTHON_REQUIRES= '>=3.5'
 TEST_SUITE='nose.collector'
 TEST_REQUIRES=['']
 PACKAGE_DIR= {'ehgfeatures': 'ehgfeatures'}
+PACKAGE_DATA= {'ehgfeatures': ['sample/*']}
 
 setup(name=DISTNAME,
       maintainer=MAINTAINER,
@@ -60,4 +61,5 @@ setup(name=DISTNAME,
       test_suite=TEST_SUITE,
       package_dir=PACKAGE_DIR,
       packages=find_packages(exclude=[]),
-      test_requires=TEST_REQUIRES)
+      test_requires=TEST_REQUIRES,
+      package_data=PACKAGE_DATA)

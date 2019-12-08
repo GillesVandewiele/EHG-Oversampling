@@ -1,10 +1,10 @@
 import logging
 
-from ._BaseFeatures import (Feature_FractalDimensionHiguchi, Feature_DFA)
+from ._BaseFeatures import (FeatureFractalDimensionHigushi, FeatureDFA, FeatureBase)
 
 __all__= ['FeaturesSubramaniam']
 
-class FeaturesSubramaniam:
+class FeaturesSubramaniam(FeatureBase):
     """
     Based on
 
@@ -21,11 +21,16 @@ class FeaturesSubramaniam:
     
     Remarks:
         1) the detrended fluctuation analysis features are not described properly, I only guess that the exponent
-            is the feature, nevertheless, there is an option in Feature_DFA to add the fluctuation coefficients too
+            is the feature, nevertheless, there is an option in FeatureDFA to add the fluctuation coefficients too
+    
+    number of features according to paper: 2
     """
 
-    def __init__(self):
-        self.features= [Feature_FractalDimensionHiguchi(), Feature_DFA()]
+    def __init__(self, return_fluctuations=False):
+        self.features= [FeatureFractalDimensionHigushi(), FeatureDFA(return_fluctuations=return_fluctuations)]
+
+    def n_features(self):
+        return sum([f.n_features() for f in self.features])
 
     def extract(self, signal):
         results= {}

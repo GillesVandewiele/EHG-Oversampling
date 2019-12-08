@@ -1,10 +1,10 @@
 import numpy as np
 
-from ehgfeatures.features import WPDDecomposition
+from ehgfeatures.features import WPDDecomposition, FeatureBase
 
 __all__=['FeaturesJanjarasjitt']
 
-class FeaturesJanjarasjitt:
+class FeaturesJanjarasjitt(FeatureBase):
     """
     Following:
         @article{Janjarasjitt2017EvaluationOP,
@@ -14,10 +14,19 @@ class FeaturesJanjarasjitt:
                 year={2017},
                 pages={1-4}
                 }
+    
+    number of features according to paper: 6
     """
 
+    def __init__(self, wavelet='db12', n_levels= 8):
+        self.wavelet=wavelet
+        self.n_levels=n_levels
+
+    def n_features(self):
+        return self.n_levels-2
+
     def extract(self, signal):
-        wpd= WPDDecomposition(wavelet='db12', n_levels=7, detail_levels_to_n=True).extract(signal)
+        wpd= WPDDecomposition(wavelet=self.wavelet, n_levels=self.n_levels, detail_levels_to_n=True).extract(signal)
         wpd= {k: wpd[k] for k in wpd if k.endswith('d')}
         
         ds= sorted(wpd.items())
