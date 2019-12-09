@@ -1,9 +1,9 @@
+import warnings
+warnings.filterwarnings('ignore')
+
 from ehgfeatures.features import FeaturesAllEHG
 
 from ehgfeatures.signal_io import get_signals
-
-import warnings
-warnings.filterwarnings('ignore')
 
 DATA_PATH= '/home/giles/Projects/EHG-Oversampling/data/tpehgdb'
 
