@@ -1,8 +1,11 @@
+import warnings
+warnings.filterwarnings('ignore')
+
 from ehgfeatures.features import FeaturesAllEHG
 
 from ehgfeatures.signal_io import get_signals
 
-DATA_PATH= '/home/gykovacs/workspaces/ehg/physionet.org/files/tpehgdb/1.0.1/tpehgdb'
+DATA_PATH= '/home/giles/Projects/EHG-Oversampling/data/tpehgdb'
 
 ids, signals, gestations, remaining_durations= get_signals(DATA_PATH, n_signals= 1)
 

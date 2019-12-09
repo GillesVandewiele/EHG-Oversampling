@@ -158,6 +158,63 @@ class FeatureStandardDeviation(FeatureBase):
         logging.info("extracting %s" % self.__class__.__name__)
         return {self.__class__.__name__: np.std(signal)}
 
+class FeatureSumAbsoluteValues(FeatureBase):
+    def n_features(self):
+        return 1
+
+    def extract(self, signal):
+        logging.info("extracting %s" % self.__class__.__name__)
+        return {self.__class__.__name__: np.sum(np.abs(signal))}
+
+class FeatureMeanAbsoluteValues(FeatureBase):
+    def n_features(self):
+        return 1
+
+    def extract(self, signal):
+        logging.info("extracting %s" % self.__class__.__name__)
+        return {self.__class__.__name__: np.mean(np.abs(signal))}
+
+class FeatureWaveletLength(FeatureBase):
+    def n_features(self):
+        return 1
+
+    def extract(self, signal):
+        logging.info("extracting %s" % self.__class__.__name__)
+        return {self.__class__.__name__: np.sum(np.abs(signal[:-1] - signal[1:]))}
+
+class FeatureLogDetector(FeatureBase):
+    def n_features(self):
+        return 1
+
+    def extract(self, signal):
+        logging.info("extracting %s" % self.__class__.__name__)
+        return {self.__class__.__name__: np.exp(np.mean(np.log(np.abs(signal))))}
+
+class FeatureVarianceAbsoluteValue(FeatureBase):
+    def n_features(self):
+        return 1
+
+    def extract(self, signal):
+        logging.info("extracting %s" % self.__class__.__name__)
+        return {self.__class__.__name__: np.var(np.abs(np.power(signal[:-1] - signal[1:], 2)))}
+
+class FeatureMaxFractalLength(FeatureBase):
+    def n_features(self):
+        return 1
+
+    def extract(self, signal):
+        logging.info("extracting %s" % self.__class__.__name__)
+        return {self.__class__.__name__: np.log(np.sqrt(np.sum(np.power(signal[:-1] - signal[1:], 2))))}
+
+class FeatureAvgAmplitudeChange(FeatureBase):
+    def n_features(self):
+        return 1
+
+    def extract(self, signal):
+        logging.info("extracting %s" % self.__class__.__name__)
+        return {self.__class__.__name__: np.mean(np.abs(signal[:-1] - signal[1:]))}
+
+
 # detrended fluctuation analysis
 
 def calc_rms(x, scale):

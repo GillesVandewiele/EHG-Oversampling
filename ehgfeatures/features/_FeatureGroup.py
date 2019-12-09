@@ -1,4 +1,6 @@
-from ehgfeatures.features import FeatureBase, FeaturesAcharya, FeaturesHosseinzahde, FeaturesJanjarasjitt, FeaturesSadiAhmed, FeaturesSubramaniam
+from ehgfeatures.features import (FeatureBase, FeaturesAcharya, FeaturesHosseinzahde, 
+                                  FeaturesJanjarasjitt, FeaturesSadiAhmed, 
+                                  FeaturesSubramaniam, FeaturesJager, FeaturesFergus)
 
 __all__= ['FeatureGroup', 'FeaturesAllEHG']
 
@@ -17,4 +19,6 @@ class FeatureGroup(FeatureBase):
 
 class FeaturesAllEHG(FeatureGroup):
     def __init__(self):
-        super().__init__(features=[FeaturesAcharya(), FeaturesHosseinzahde(), FeaturesJanjarasjitt(), FeaturesSadiAhmed(), FeaturesSubramaniam()])
+        super().__init__(features=[FeaturesAcharya(), FeaturesHosseinzahde(), 
+                                   FeaturesJanjarasjitt(), FeaturesSadiAhmed(), 
+                                   FeaturesSubramaniam(), FeaturesJager(), FeaturesFergus()])
