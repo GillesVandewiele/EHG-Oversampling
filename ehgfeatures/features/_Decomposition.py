@@ -13,7 +13,10 @@ class EMDDecomposition:
         self.n_levels= n_levels
 
     def extract(self, signal):
-        emds= PyEMD.EMD()(signal)
+        emd = PyEMD.EMD()
+        emd.range_thr = float('-inf')
+        emd.total_power_thr = float('-inf')
+        emds = emd(signal)
 
         return {'emd_' + str(i): emds[i] for i in range(min([len(emds), self.n_levels]))}
 

@@ -39,30 +39,27 @@ def get_signals(directory, n_signals= -1):
 
     ids= []
     signals= []
-    gestations= []
-    remaining_durations= []
+    all_clin_names = []
+    all_clin_values = []
 
     for i, f in enumerate(files):
         print("reading file %d/%d: %s" % (i, len(files), f))
         file_id= f.split(os.path.sep)[-1].split('.')[0]
-        ids.append(file_id)
         record_path= f[:-4]
         record= wfdb.rdrecord(record_path)
         clin_names, clin_values= process_header_file(record_path)
-        gestation= float(clin_values[1])
-        rectime= float(clin_values[2])
-        remaining_duration= gestation - rectime
 
         signal_ch1= record.p_signal[:,2]
         signal_ch2= record.p_signal[:,6]
         signal_ch3= record.p_signal[:,10]
 
-        if len(signal_ch1) < 33000: # Faulty signal
+        if len(signal_ch1) < 33000 or len(signal_ch2) < 33000 or len(signal_ch3) < 33000: # Faulty signal
             print("faulty signal length: %d" % len(signal_ch1))
             continue
 
         signals.append([signal_ch1, signal_ch2, signal_ch3])
-        gestations.append(gestation)
-        remaining_durations.append(remaining_duration)
+        all_clin_names.append(clin_names)
+        all_clin_values.append(clin_values)
+        ids.append(file_id)
 
-    return np.array(ids), np.array(signals), np.array(gestations), np.array(remaining_durations)
+    return np.array(ids), np.array(signals), all_clin_names, all_clin_values

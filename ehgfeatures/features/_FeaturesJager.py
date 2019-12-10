@@ -26,7 +26,7 @@ class FeaturesJager(FeatureBase):
 
     number of features according to paper: 7 (three of these are very slow)
     """
-    def __init__(self, fs=20, slow=True, r=0.15, sampen_order=2, Q=7, 
+    def __init__(self, fs=20, slow=False, r=0.15, sampen_order=2, Q=7, 
                  lyap_maxt=10, corr_measures=7):
         self.slow = slow
         self.fs = fs
