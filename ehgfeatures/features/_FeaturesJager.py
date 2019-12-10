@@ -26,7 +26,7 @@ class FeaturesJager(FeatureBase):
 
     number of features according to paper: 7 (three of these are very slow)
     """
-    def __init__(self, fs=20, slow=False, r=0.15, sampen_order=2, Q=7, 
+    def __init__(self, fs=20, slow=True, r=0.15, sampen_order=2, Q=7, 
                  lyap_maxt=10, corr_measures=7):
         self.slow = slow
         self.fs = fs
@@ -126,13 +126,13 @@ class FeaturesJager(FeatureBase):
         phi = self._app_samp_entropy(signal, self.sampen_order, r=self.r)
         return np.subtract(phi[0], phi[1])
 
-    def _ac_zero_crossing(signal):
+    def _ac_zero_crossing(self, signal):
         tau = sm.tsa.acf(signal, nlags=len(signal) - 1)
         tau_neg_ix = np.arange(len(tau), dtype=int)[tau < 0]
         return tau_neg_ix[0]
 
     def _max_lyap(self, signal, ac_zero):
-        y = mle_embed(signal, [self.Q], ac_zero, maxt=self.maxt)[0]
+        y = mle_embed(signal, [self.Q], ac_zero, maxt=self.lyap_maxt)[0]
         x = np.arange(len(y))
         return np.polyfit(x, y, 1)[0]
 

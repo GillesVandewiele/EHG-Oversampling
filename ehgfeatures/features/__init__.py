@@ -7,4 +7,5 @@ from ._FeaturesHosseinzahde import *
 from ._FeaturesSadiAhmed import *
 from ._FeaturesJager import *
 from ._FeaturesFergus import *
+from ._FeaturesTSFRESH import *
 from ._FeatureGroup import *
