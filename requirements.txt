@@ -1,7 +1,10 @@
 numpy
 pandas
 scipy
-PyEMD
+wfdb
+git+https://github.com/laszukdawid/PyEMD.git
+git+https://github.com/manu-mannattil/nolitsa.git
+git+https://github.com/raphaelvallat/entropy.git
+git+https://github.com/blue-yonder/tsfresh.git
 PyWavelets
 neurokit
-entropy
