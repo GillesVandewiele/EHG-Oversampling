@@ -32,7 +32,17 @@ CLASSIFIERS= [  'Intended Audience :: Science/Research',
                 'Operating System :: POSIX',
                 'Operating System :: Unix',
                 'Operating System :: MacOS']
-INSTALL_REQUIRES= ['wfdb', 'numpy', 'pandas', 'scipy', 'PyEMD', 'PyWavelets', 'neurokit', 'entropy']
+INSTALL_REQUIRES= [
+                    'numpy', 
+                    'wfdb', 
+                    'pandas', 
+                    'scipy', 
+                    'PyWavelets', 
+                    'neurokit', 
+                    'PyEMD @ git+ssh://git@github.com/laszukdawid/PyEMD.git#egg=PyEMD', 
+                    'nolitsa @ git+ssh://git@github.com/manu-mannattil/nolitsa.git#egg=nolitsa',
+                    'entropy @ git+ssh://git@github.com/raphaelvallat/entropy.git#egg=entropy',
+                    'tsfresh @ git+ssh://git@github.com/blue-yonder/tsfresh.git#egg=tsfresh']
 EXTRAS_REQUIRE= {'tests': ['nose'],
                  'docs': ['sphinx', 'sphinx-gallery', 'sphinx_rtd_theme', 'matplotlib', 'pandas']}
 PYTHON_REQUIRES= '>=3.5'
