@@ -14,6 +14,8 @@ from sklearn.model_selection import GridSearchCV, train_test_split, StratifiedKF
 from sklearn.metrics import confusion_matrix
 from sklearn.preprocessing import StandardScaler
 
+import warnings; warnings.filterwarnings('ignore')
+
 
 # Util classes & functions for feature selection
 class PipelineRFE(Pipeline):
@@ -179,7 +181,7 @@ feature_matrix = feature_matrix.drop(useless_features, axis=1)
 X = feature_matrix.reset_index(drop=True)
 y = feature_matrix['Rectime'] + ttb >= 37
 
-skf = StratifiedKFold(n_splits=5)
+skf = StratifiedKFold(n_splits=5, random_state=42)
 for sampling_alg in sv.get_n_quickest_oversamplers(50):
 
     # Pipeline: apply standard scaling, oversample & fit logreg with hyper-parameter tuning
@@ -217,4 +219,4 @@ for sampling_alg in sv.get_n_quickest_oversamplers(50):
         
     # Write away predictions
     preds = pd.DataFrame(preds, columns=['fold', 'prediction'])
-    preds.to_csv('output/{}_predictions.csv')
+    preds.to_csv('output/{}_predictions.csv'.format(sampling_alg))
