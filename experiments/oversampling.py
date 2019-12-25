@@ -184,6 +184,9 @@ y = feature_matrix['Rectime'] + ttb >= 37
 skf = StratifiedKFold(n_splits=5, random_state=42)
 for sampling_alg in sv.get_n_quickest_oversamplers(50):
 
+    if 'Gazzah' not in sampling_alg.__name__:
+        continue
+
     # Pipeline: apply standard scaling, oversample & fit logreg with hyper-parameter tuning
     pipeline = PipelineRFE([
         (
@@ -197,13 +200,13 @@ for sampling_alg in sv.get_n_quickest_oversamplers(50):
                 GridSearchCV(
                     LogisticRegression(), 
                     {'penalty': ['l1', 'l2'], 'C': [10**i for i in range(-4, 5)]},
-                    scoring='roc_auc'
+                    scoring='roc_auc', cv=3
                 )
             )
         )
     ])
     
-    preds = np.zeros((len(X), 2))
+    preds = np.zeros((len(X), 3))
     for fold_ix, (train_idx, test_idx) in enumerate(skf.split(X, y)):
         X_train = X.iloc[train_idx, :]
         X_test = X.iloc[test_idx, :]
@@ -215,8 +218,9 @@ for sampling_alg in sv.get_n_quickest_oversamplers(50):
         clf.fit(X_train.values, y_train.values)
         
         preds[test_idx, 0] = fold_ix
-        preds[test_idx, 1] = clf.predict_proba(X_test.values)[:, 1]
+        preds[test_idx, 1] = y_test
+        preds[test_idx, 2] = clf.predict_proba(X_test.values)[:, 1]
         
     # Write away predictions
-    preds = pd.DataFrame(preds, columns=['fold', 'prediction'])
-    preds.to_csv('output/{}_predictions.csv'.format(sampling_alg))
+    preds = pd.DataFrame(preds, columns=['fold', 'label', 'prediction'])
+    preds.to_csv('output/{}_predictions.csv'.format(sampling_alg.__name__))
