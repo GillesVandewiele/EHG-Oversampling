@@ -77,7 +77,7 @@ def get_uncorr_features(data):
     correlated_features = get_corr_features(X_train_corr)
     to_remove = set()
     for corr_row, corr_col in correlated_features:
-        if corr_row in to_remove:
+        if corr_row in to_remove or corr_col in to_remove:
             continue
 
         for corr_row2, corr_col2 in correlated_features:
@@ -142,6 +142,8 @@ features['Term'] = features['Gestation'] >= 37
 # Create a feature matrix by concatenating the features of the three channels per sample
 features[['Gestation', 'Rectime', 'Age', 'Parity', 'Abortions', 'Weight']] = features[['Gestation', 'Rectime', 'Age', 'Parity', 'Abortions', 'Weight']].replace(to_replace='None', value=np.NaN)
 
+features = features[features['Gestation'] != features['Rectime']]
+
 ids = set(features['id'])
 channels = set(features['channel'])
 joined_features = []
@@ -170,6 +172,7 @@ for col in joined_features.columns[joined_features.isnull().sum() > 0]:
     
 ttb = joined_features['TimeToBirth_ch1']
 feature_matrix = joined_features.drop(['TimeToBirth_ch3', 'TimeToBirth_ch2', 'TimeToBirth_ch1', 'Gestation', 
+                                       'Term_ch1', 'Term_ch2', 'Term_ch3',
                                        'RecID', 'channel', 'id'], axis=1)
 
 
@@ -184,9 +187,6 @@ y = feature_matrix['Rectime'] + ttb >= 37
 skf = StratifiedKFold(n_splits=5, random_state=42)
 for sampling_alg in sv.get_n_quickest_oversamplers(50):
 
-    if 'Gazzah' not in sampling_alg.__name__:
-        continue
-
     # Pipeline: apply standard scaling, oversample & fit logreg with hyper-parameter tuning
     pipeline = PipelineRFE([
         (
@@ -200,11 +200,13 @@ for sampling_alg in sv.get_n_quickest_oversamplers(50):
                 GridSearchCV(
                     LogisticRegression(), 
                     {'penalty': ['l1', 'l2'], 'C': [10**i for i in range(-4, 5)]},
-                    scoring='roc_auc', cv=3
+                    scoring='roc_auc', cv=StratifiedKFold(n_splits=3, random_state=42)
                 )
             )
         )
     ])
+
+    # TODO: Tune hyper-parameters of both the classifier & sampling algorithm
     
     preds = np.zeros((len(X), 3))
     for fold_ix, (train_idx, test_idx) in enumerate(skf.split(X, y)):
@@ -214,11 +216,8 @@ for sampling_alg in sv.get_n_quickest_oversamplers(50):
         y_test = y.iloc[test_idx]
         
         # Fit with feature selection
-        try:
-            clf = RFECV(pipeline, cv=3, step=100, scoring='roc_auc')
-            clf.fit(X_train.values, y_train.values)
-        except:
-            continue
+        clf = RFECV(pipeline, cv=StratifiedKFold(n_splits=3, random_state=42), step=100, scoring='roc_auc')
+        clf.fit(X_train.values, y_train.values)
         
         preds[test_idx, 0] = fold_ix
         preds[test_idx, 1] = y_test
@@ -227,6 +226,3 @@ for sampling_alg in sv.get_n_quickest_oversamplers(50):
     # Write away predictions
     preds = pd.DataFrame(preds, columns=['fold', 'label', 'prediction'])
     preds.to_csv('output/{}_predictions.csv'.format(sampling_alg.__name__))
-
-from experiments.acharya import study_acharya
-acharya_features= features[[c for c in features if 'Acharya' in c]]

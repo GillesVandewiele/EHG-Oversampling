@@ -49,9 +49,9 @@ def get_signals(directory, n_signals= -1):
         record= wfdb.rdrecord(record_path)
         clin_names, clin_values= process_header_file(record_path)
 
-        signal_ch1= record.p_signal[:,2]
-        signal_ch2= record.p_signal[:,6]
-        signal_ch3= record.p_signal[:,10]
+        signal_ch1= record.p_signal[:, 1]
+        signal_ch2= record.p_signal[:, 5]
+        signal_ch3= record.p_signal[:, 9]
 
         if len(signal_ch1) < 33000 or len(signal_ch2) < 33000 or len(signal_ch3) < 33000: # Faulty signal
             print("faulty signal length: %d" % len(signal_ch1))
