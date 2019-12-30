@@ -10,14 +10,11 @@
 
 import os.path
 
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.tree import DecisionTreeClassifier
-
 import pandas as pd
 
 import smote_variants as sv
 
-features= pd.read_csv('output/raw_features.csv')
+features= pd.read_csv('output/cleaned_features.csv')
 target= pd.read_csv('output/target.csv', header=None, index_col=None)
 
 
@@ -39,13 +36,19 @@ if not os.path.exists(cache_path):
 # field which is used for labelling in the model selection functions, but the datasets loaded from 
 # sklearn.datasets lack the 'name' field, therefore, we need to add it manually.
 
-dataset= {'data': features.values, 'target': target.values[:,0], 'name': 'ehg'}
+from sklearn.preprocessing import StandardScaler
+
+dataset= {'data': StandardScaler().fit_transform(features.values), 'target': target.values[:,0], 'name': 'ehg'}
 
 
 # In[4]:
 
 
 # Specifying the classifiers.
+
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.linear_model import LogisticRegression
 
 dt_classifiers= [DecisionTreeClassifier(criterion="gini", max_depth=3),
                     DecisionTreeClassifier(criterion="gini", max_depth=5),
@@ -54,6 +57,24 @@ dt_classifiers= [DecisionTreeClassifier(criterion="gini", max_depth=3),
                     DecisionTreeClassifier(criterion="entropy", max_depth=5),
                     DecisionTreeClassifier(criterion="entropy", max_depth=7)]
 
+lr_classifiers= [LogisticRegression(penalty='l2', C=0.01, fit_intercept=True),
+                 LogisticRegression(penalty='l2', C=0.01, fit_intercept=False),
+                 LogisticRegression(penalty='l2', C=0.1, fit_intercept=True),
+                 LogisticRegression(penalty='l2', C=0.1, fit_intercept=False),
+                 LogisticRegression(penalty='l2', C=1.0, fit_intercept=True),
+                 LogisticRegression(penalty='l2', C=1.0, fit_intercept=False),
+                 LogisticRegression(penalty='l2', C=10.0, fit_intercept=True),
+                 LogisticRegression(penalty='l2', C=10.0, fit_intercept=False),
+                 LogisticRegression(penalty='l1', C=0.01, fit_intercept=True),
+                 LogisticRegression(penalty='l1', C=0.01, fit_intercept=False),
+                 LogisticRegression(penalty='l1', C=0.1, fit_intercept=True),
+                 LogisticRegression(penalty='l1', C=0.1, fit_intercept=False),
+                 LogisticRegression(penalty='l1', C=1.0, fit_intercept=True),
+                 LogisticRegression(penalty='l1', C=1.0, fit_intercept=False),
+                 LogisticRegression(penalty='l1', C=10.0, fit_intercept=True),
+                 LogisticRegression(penalty='l1', C=10.0, fit_intercept=False)]
+
+all_classifiers= dt_classifiers + lr_classifiers
 # In[5]:
 
 
@@ -82,7 +103,7 @@ samp_obj, cl_obj= sv.model_selection(dataset= dataset,
                                                     sv.NEATER],
                                         classifiers= dt_classifiers,
                                         cache_path= cache_path,
-                                        n_jobs= 5,
+                                        n_jobs= 4,
                                         max_samp_par_comb= 35)
 
 
