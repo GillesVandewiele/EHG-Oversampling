@@ -46,10 +46,15 @@ feature_groups = [
     ['FeaturesFergusFeatureVarianceAbsoluteValue'], 
     ['FeaturesFergusFeatureSumAbsoluteValues'], ['FeatureDFA'], 
     ['FeaturesFergusFeatureMaxFractalLength'], ['FeaturesFergusFeatureLogDetector'], 
-    ['FeaturesJager_sampen'],    
+    ['FeaturesJager_sampen'], ['FeaturesJager_max_lyap'],
+    ['FeaturesJager_ac_zero'], ['FeaturesJager_corr_dim'],
     list(filter(lambda col: 'TSFRESH' in col, features.columns)),
 ]
 
+included = set()
+for group in feature_groups:
+    included = included.union(set(group))
+print(set(features.columns) - included)
 
 all_features_aucs = []
 
