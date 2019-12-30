@@ -72,17 +72,19 @@ class FeaturesSadiAhmed(FeatureBase):
 
             fwh_peak_freq= fwh[0][np.argmax(fwh[1])]
             fwl_peak_freq= fwl[0][np.argmax(fwl[1])]
-            gap= fwh_peak_freq - fwl_peak_freq
+            gap_freq= fwh_peak_freq - fwl_peak_freq
             fwh_peak_power= np.max(fwh[1])
             fwl_peak_power= np.max(fwl[1])
+            gap_power= fwl_peak_power - fwh_peak_power
 
             prefix= self.__class__.__name__ + '_emd_' + str(i) + '_'
             results[prefix + 'n_peaks']= n_peaks
             results[prefix + 'med_freq']= med_freq
             results[prefix + 'fwh_peak_freq']= fwh_peak_freq
-            results[prefix + 'fwl_peak_freq']= fwl_peak_freq
-            results[prefix + 'gap']= gap
+            #results[prefix + 'fwl_peak_freq']= fwl_peak_freq
+            results[prefix + 'gap_freq']= gap_freq
             results[prefix + 'fwh_peak_power']= fwh_peak_power
             results[prefix + 'fwl_peak_power']= fwl_peak_power
+            results[prefix + 'gap_power']= gap_power
         
         return results

@@ -44,4 +44,8 @@ class FeaturesHosseinzahde(FeatureBase):
                     for t in tmp:
                         results[w + '_' + t]= tmp[t]
         
-        return results
+        renamed_results= {}
+        for r in results:
+            renamed_results[self.__class__.__name__ + '_' + r]= results[r]
+
+        return renamed_results

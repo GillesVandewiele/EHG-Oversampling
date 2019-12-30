@@ -214,8 +214,11 @@ for sampling_alg in sv.get_n_quickest_oversamplers(50):
         y_test = y.iloc[test_idx]
         
         # Fit with feature selection
-        clf = RFECV(pipeline, cv=3, step=100, scoring='roc_auc')
-        clf.fit(X_train.values, y_train.values)
+        try:
+            clf = RFECV(pipeline, cv=3, step=100, scoring='roc_auc')
+            clf.fit(X_train.values, y_train.values)
+        except:
+            continue
         
         preds[test_idx, 0] = fold_ix
         preds[test_idx, 1] = y_test
@@ -224,3 +227,6 @@ for sampling_alg in sv.get_n_quickest_oversamplers(50):
     # Write away predictions
     preds = pd.DataFrame(preds, columns=['fold', 'label', 'prediction'])
     preds.to_csv('output/{}_predictions.csv'.format(sampling_alg.__name__))
+
+from experiments.acharya import study_acharya
+acharya_features= features[[c for c in features if 'Acharya' in c]]

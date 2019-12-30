@@ -32,7 +32,7 @@ def get_signals(directory, n_signals= -1):
         np.array, np.array, np.array, np.array: ids, signals, gestations, remaining_durations
     """
 
-    files= glob.glob(os.path.join(directory, '*.dat'))
+    files= sorted(glob.glob(os.path.join(directory, '*.dat')))
 
     if n_signals > 0:
         files= files[:n_signals]

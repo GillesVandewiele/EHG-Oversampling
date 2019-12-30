@@ -37,5 +37,9 @@ class FeaturesSubramaniam(FeatureBase):
         for f in self.features:
             tmp= f.extract(signal)
             results= {**results, **tmp}
+        
+        renamed_results= {}
+        for r in results:
+            renamed_results[self.__class__.__name__ + '_' + r]= results[r]
 
-        return results
+        return renamed_results
