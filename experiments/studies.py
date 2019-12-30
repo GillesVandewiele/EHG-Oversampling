@@ -12,3 +12,6 @@ print("ACHARYA")
 for r in results:
     if "auc" in r:
         print(r, results[r])
+        
+[c for c in features.columns if "Sadi" in c]
+sadiahmed_features=[]
