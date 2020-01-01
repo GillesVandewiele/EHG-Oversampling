@@ -51,42 +51,12 @@ def evaluate(pipeline, X, y, validator):
 
     return preds
 
-
-def evaluate_pso(pipeline, X, y, validator):
-    X=X.values
-    y=y.values
-    def f_per_particle(m, alpha):
-        if np.count_nonzero(m) == 0:
-            X_subset = X
-        else:
-            X_subset = X[:,m == 1]
-        
-        pipeline.fit(X_subset, y)
-        P= (pipeline.predict(X_subset) == y).mean()
-        j= (alpha*(1.0 - P) + (1.0 - alpha)*(1 - (X_subset.shape[1]/len(X[0]))))
-
-        return j
-
-    def f(x, alpha=0.88, verbose=None):
-        n_particles= x.shape[0]
-        j= [f_per_particle(x[i], alpha) for i in range(n_particles)]
-        return np.array(j)
-        
-    options= {'c1': 0.5, 'c2': 0.5, 'w': 0.9, 'k': 30, 'p': 2}
-    dimensions= len(X[0])
-    optimizer= ps.discrete.BinaryPSO(n_particles=30, dimensions=dimensions, options=options)
-
-    cost, pos= optimizer.optimize(f, iters=100, verbose=2)
-
-    print(cost)
-    print(pos)
-
 def study_sadiahmed(features, target, preprocessing=StandardScaler(), grid=True, random_seed=42, output_file='sadiahmed_results.json'):
     features= features.loc[:,sadiahmed_features]
 
     results= {}
-    base_classifier= SVC(kernel='linear', random_state=random_seed, probability=True)
-    grid_search_params= {'kernel': ['linear'], 'C': [10**i for i in range(-4, 5)], 'probability': [True], 'random_state': [random_seed]}
+    base_classifier= SVC(kernel='rbf', random_state=random_seed, probability=True)
+    grid_search_params= {'kernel': ['rbf'], 'C': [10**i for i in range(-4, 5)], 'probability': [True], 'random_state': [random_seed]}
 
     # without oversampling
     classifier= base_classifier if not grid else GridSearchCV(base_classifier, grid_search_params, scoring='roc_auc')

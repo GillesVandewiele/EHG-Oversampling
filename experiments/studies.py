@@ -10,30 +10,41 @@ target= pd.read_csv('output/target.csv', header=None, index_col=None)
 X= features
 y= target.loc[:,0]
 
-results_acharya= study_acharya(X[[c for c in X.columns if "Acharya" in c]], y)
+results= {}
+
+results['acharya']= study_acharya(X[[c for c in X.columns if "Acharya" in c]], y)
 
 print("ACHARYA")
-for r in results_acharya:
+for r in results['acharya']:
     if "auc" in r:
-        print(r, results_acharya[r])
+        print(r, results['acharya'][r])
 
-results_hosseinzahde= study_hosseinzahde(X[[c for c in X.columns if "Hosseinzahde" in c]], y)
+results['hosseinzahde']= study_hosseinzahde(X[[c for c in X.columns if "Hosseinzahde" in c]], y)
 
 print("HOSSEINZAHDE")
-for r in results_hosseinzahde:
+for r in results['hosseinzahde']:
     if "auc" in r:
-        print(r, results_hosseinzahde[r])
+        print(r, results['hosseinzahde'][r])
 
-results_sadiahmed= study_sadiahmed(X[[c for c in X.columns if "SadiAhmed" in c]], y)
+results['sadiahmed']= study_sadiahmed(X[[c for c in X.columns if "SadiAhmed" in c]], y)
 
 print("SADI AHMED")
-for r in results_sadiahmed:
+for r in results['sadiahmed']:
     if "auc" in r:
-        print(r, results_sadiahmed[r])
+        print(r, results['sadiahmed'][r])
 
-results_fergus= study_fergus(X[[c for c in X.columns if "Fergus" in c]], y, grid=False)
+results['fergus']= study_fergus(X[[c for c in X.columns if "Fergus" in c]], y, grid=False)
 
 print("FERGUS")
-for r in results_fergus:
+for r in results['fergus']:
     if "auc" in r:
-        print(r, results_fergus[r])
+        print(r, results['fergus'][r])
+
+all_results= pd.DataFrame(results).T
+all_results= all_results[[c for c in all_results.columns if 'auc' in c]].T
+
+pd.set_option('display.max_rows', 500)
+pd.set_option('display.max_columns', 500)
+pd.set_option('display.width', 1000)
+
+print(all_results)
