@@ -31,7 +31,7 @@ def evaluate(pipeline, X, y, validator):
     return preds
 
 def feature_importances(X, y):
-    classifier= RandomForestClassifier().fit(X.values, y.values)
+    classifier= RandomForestClassifier(random_state=5).fit(X.values, y.values)
     importances= classifier.feature_importances_
     sorted_importances= np.argsort(importances)[::-1]
 
