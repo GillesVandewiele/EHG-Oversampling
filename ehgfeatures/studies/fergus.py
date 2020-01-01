@@ -1,11 +1,10 @@
-from smote_variants import ADASYN, OversamplingClassifier
+from smote_variants import SMOTE, OversamplingClassifier
 
 from sklearn.svm import SVC
 from sklearn.model_selection import StratifiedKFold, GridSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import roc_auc_score
 from sklearn.preprocessing import StandardScaler
-from sklearn.ensemble import RandomForestClassifier
 
 import numpy as np
 import pandas as pd
@@ -13,6 +12,15 @@ import pandas as pd
 import pyswarms as ps
 
 import json
+
+import keras
+from keras.layers import Dense, Flatten, Input
+from keras.models import Sequential
+from keras.losses import binary_crossentropy
+from keras.layers import Layer
+from keras import backend as K
+
+from sklearn.base import ClassifierMixin, TransformerMixin
 
 def evaluate(pipeline, X, y, validator):
     preds= np.zeros((len(X), 3))
@@ -30,19 +38,62 @@ def evaluate(pipeline, X, y, validator):
 
     return preds
 
-def feature_importances(X, y):
-    classifier= RandomForestClassifier(random_state=5).fit(X.values, y.values)
-    importances= classifier.feature_importances_
-    sorted_importances= np.argsort(importances)[::-1]
+class RBFLayer(Layer):
+    def __init__(self, units, gamma, **kwargs):
+        super(RBFLayer, self).__init__(**kwargs)
+        self.units = units
+        self.gamma = K.cast_to_floatx(gamma)
 
-    return X.columns[sorted_importances[:10]]
+    def build(self, input_shape):
+        self.mu = self.add_weight(name='mu',
+                                  shape=(int(input_shape[1]), self.units),
+                                  initializer='uniform',
+                                  trainable=True)
+        super(RBFLayer, self).build(input_shape)
 
-def study_hosseinzahde(features, target, preprocessing=StandardScaler(), grid=True, random_seed=42, output_file='hosseinzahde_results.json'):
-    features= features.loc[:,feature_importances(features, target)]
+    def call(self, inputs):
+        diff = K.expand_dims(inputs) - self.mu
+        l2 = K.sum(K.pow(diff, 2), axis=1)
+        res = K.exp(-1 * self.gamma * l2)
+        return res
 
+    def compute_output_shape(self, input_shape):
+        return (input_shape[0], self.units)
+
+class RadialBasisNeuralNetworkClassifier(TransformerMixin, ClassifierMixin):
+    def __init__(self, batch_size= 100, epochs=100):
+        self.batch_size= batch_size
+        self.epochs= epochs
+
+    def fit(self, X, y):
+        self.model= Sequential()
+        self.model.add(Dense(len(X[0]), input_shape=(len(X[0]),)))
+        self.model.add(RBFLayer(len(X[0]), 0.5))
+        self.model.add(Dense(1, activation='sigmoid', name='output'))
+        self.model.compile(optimizer='rmsprop', loss=binary_crossentropy)
+        self.model.fit(X, y, batch_size=self.batch_size, epochs=self.epochs)
+
+        return self
+    
+    def predict(self, X):
+        return (self.model.predict(X) > 0.5).astype(int)
+    
+    def predict_proba(self, X):
+        preds= self.model.predict(X)
+        preds= preds[:,0]
+        preds= np.vstack([1.0 - preds, preds]).T
+        return preds
+    
+    def get_params(self, deep=False):
+        return {}
+    
+    def set_params(self):
+        return self
+
+def study_fergus(features, target, preprocessing=StandardScaler(), grid=True, random_seed=42, output_file='fergus_results.json'):
     results= {}
-    base_classifier= SVC(kernel='rbf', random_state=random_seed, probability=True)
-    grid_search_params= {'kernel': ['rbf'], 'C': [10**i for i in range(-4, 5)], 'probability': [True], 'random_state': [random_seed]}
+    base_classifier= RadialBasisNeuralNetworkClassifier()
+    grid_search_params= {}
 
     # without oversampling
     classifier= base_classifier if not grid else GridSearchCV(base_classifier, grid_search_params, scoring='roc_auc')
@@ -57,7 +108,7 @@ def study_hosseinzahde(features, target, preprocessing=StandardScaler(), grid=Tr
 
     # with correct oversampling
     classifier= base_classifier if not grid else GridSearchCV(base_classifier, grid_search_params, scoring='roc_auc')
-    classifier= OversamplingClassifier(ADASYN(), classifier)
+    classifier= OversamplingClassifier(SMOTE(), classifier)
     pipeline= classifier if not preprocessing else Pipeline([('preprocessing', preprocessing), ('classifier', classifier)])
     validator= StratifiedKFold(n_splits=10, random_state= random_seed)
 
@@ -75,7 +126,7 @@ def study_hosseinzahde(features, target, preprocessing=StandardScaler(), grid=Tr
     print('in sample: ', results['in_sample_auc'])
 
     # with incorrect oversampling
-    X, y= ADASYN().sample(features.values, target.values)
+    X, y= SMOTE().sample(features.values, target.values)
     X= pd.DataFrame(X, columns=features.columns)
     y= pd.Series(y)
 
