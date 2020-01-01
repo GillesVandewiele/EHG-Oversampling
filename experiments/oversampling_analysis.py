@@ -15,6 +15,7 @@ import pandas as pd
 import smote_variants as sv
 
 features= pd.read_csv('output/cleaned_features.csv')
+features= features.drop(['Unnamed: 0', 'Term_ch2'], axis='columns')
 target= pd.read_csv('output/target.csv', header=None, index_col=None)
 
 
@@ -57,22 +58,22 @@ dt_classifiers= [DecisionTreeClassifier(criterion="gini", max_depth=3),
                     DecisionTreeClassifier(criterion="entropy", max_depth=5),
                     DecisionTreeClassifier(criterion="entropy", max_depth=7)]
 
-lr_classifiers= [LogisticRegression(penalty='l2', C=0.01, fit_intercept=True),
-                 LogisticRegression(penalty='l2', C=0.01, fit_intercept=False),
-                 LogisticRegression(penalty='l2', C=0.1, fit_intercept=True),
-                 LogisticRegression(penalty='l2', C=0.1, fit_intercept=False),
-                 LogisticRegression(penalty='l2', C=1.0, fit_intercept=True),
-                 LogisticRegression(penalty='l2', C=1.0, fit_intercept=False),
-                 LogisticRegression(penalty='l2', C=10.0, fit_intercept=True),
-                 LogisticRegression(penalty='l2', C=10.0, fit_intercept=False),
-                 LogisticRegression(penalty='l1', C=0.01, fit_intercept=True),
-                 LogisticRegression(penalty='l1', C=0.01, fit_intercept=False),
-                 LogisticRegression(penalty='l1', C=0.1, fit_intercept=True),
-                 LogisticRegression(penalty='l1', C=0.1, fit_intercept=False),
-                 LogisticRegression(penalty='l1', C=1.0, fit_intercept=True),
-                 LogisticRegression(penalty='l1', C=1.0, fit_intercept=False),
-                 LogisticRegression(penalty='l1', C=10.0, fit_intercept=True),
-                 LogisticRegression(penalty='l1', C=10.0, fit_intercept=False)]
+lr_classifiers= [LogisticRegression(penalty='l2', C=0.01, fit_intercept=True, n_jobs=1),
+                 LogisticRegression(penalty='l2', C=0.01, fit_intercept=False, n_jobs=1),
+                 LogisticRegression(penalty='l2', C=0.1, fit_intercept=True, n_jobs=1),
+                 LogisticRegression(penalty='l2', C=0.1, fit_intercept=False, n_jobs=1),
+                 LogisticRegression(penalty='l2', C=1.0, fit_intercept=True, n_jobs=1),
+                 LogisticRegression(penalty='l2', C=1.0, fit_intercept=False, n_jobs=1),
+                 LogisticRegression(penalty='l2', C=10.0, fit_intercept=True, n_jobs=1),
+                 LogisticRegression(penalty='l2', C=10.0, fit_intercept=False, n_jobs=1),
+                 LogisticRegression(penalty='l1', C=0.01, fit_intercept=True, n_jobs=1, solver='liblinear'),
+                 LogisticRegression(penalty='l1', C=0.01, fit_intercept=False, n_jobs=1, solver='liblinear'),
+                 LogisticRegression(penalty='l1', C=0.1, fit_intercept=True, n_jobs=1, solver='liblinear'),
+                 LogisticRegression(penalty='l1', C=0.1, fit_intercept=False, n_jobs=1, solver='liblinear'),
+                 LogisticRegression(penalty='l1', C=1.0, fit_intercept=True, n_jobs=1, solver='liblinear'),
+                 LogisticRegression(penalty='l1', C=1.0, fit_intercept=False, n_jobs=1, solver='liblinear'),
+                 LogisticRegression(penalty='l1', C=10.0, fit_intercept=True, n_jobs=1, solver='liblinear'),
+                 LogisticRegression(penalty='l1', C=10.0, fit_intercept=False, n_jobs=1, solver='liblinear')]
 
 all_classifiers= dt_classifiers + lr_classifiers
 # In[5]:
@@ -100,11 +101,14 @@ samp_obj, cl_obj= sv.model_selection(dataset= dataset,
                                                     sv.Supervised_SMOTE,
                                                     sv.CBSO,
                                                     sv.cluster_SMOTE,
-                                                    sv.NEATER],
+                                                    sv.NEATER,
+                                                    sv.NoSMOTE
+                                                    ],
                                         classifiers= dt_classifiers,
                                         cache_path= cache_path,
-                                        n_jobs= 4,
-                                        max_samp_par_comb= 35)
+                                        n_jobs= 5,
+                                        max_samp_par_comb= 25,
+                                        random_state= 5)
 
 
 # In[6]:
@@ -112,6 +116,31 @@ samp_obj, cl_obj= sv.model_selection(dataset= dataset,
 
 # Oversampling and training the classifier providing the best results in the model selection procedure
 
-X_samp, y_samp= samp_obj.sample(dataset['data'], dataset['target'])
-cl_obj.fit(X_samp, y_samp)
+results= sv.read_oversampling_results([dataset], cache_path, all_results=False)
 
+oc= sv.OversamplingClassifier(samp_obj, cl_obj)
+oc= cl_obj
+
+from sklearn.model_selection import RepeatedStratifiedKFold
+validator= RepeatedStratifiedKFold(n_splits= 5, n_repeats= 5)
+
+import numpy as np
+
+X, y= dataset['data'], dataset['target']
+
+all_test, all_pred= [], []
+
+for train, test in validator.split(X, y):
+    X_train, X_test= X[train], X[test]
+    y_train, y_test= y[train], y[test]
+    
+    oc.fit(X_train, y_train)
+    pred= oc.predict(X_test)
+    
+    all_test.append(y_test)
+    all_pred.append(pred)
+    
+all_test= np.hstack(all_test)
+all_pred= np.hstack(all_pred)
+
+acc= np.sum(all_test == all_pred)/len(all_test)
