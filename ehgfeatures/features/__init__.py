@@ -9,4 +9,5 @@ from ._FeaturesJager import *
 from ._FeaturesFergus import *
 from ._FeaturesTSFRESH import *
 from ._FeaturesAhmed import *
+from ._FeaturesRen import *
 from ._FeatureGroup import *

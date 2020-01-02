@@ -42,33 +42,33 @@ results= {}
 #     if "auc" in r:
 #         print(r, results['fergus'][r])
 
-# fergus_features = [
-# 	'Hypertension_None', 'Hypertension_no',
-# 	'Hypertension_yes', 'Diabetes_None',
-# 	'Diabetes_no', 'Diabetes_yes',
-# 	'Placental_position_None', 'Placental_position_end',
-# 	'Placental_position_front', 'Bleeding_first_trimester_None',
-# 	'Bleeding_first_trimester_no', 'Bleeding_first_trimester_yes',
-# 	'Bleeding_second_trimester_None', 'Bleeding_second_trimester_no',
-# 	'Bleeding_second_trimester_yes', 'Funneling_None',
-# 	'Funneling_negative', 'Funneling_positive',
-# 	'Smoker_None', 'Smoker_no', 'Smoker_yes',
-# 	'Weight', 'Rectime', 'Age', 'Parity', 'Abortions',
-# 	'FeaturesJager_fmed_ch1', 'FeaturesJager_fpeak_ch1', 
-# 	'FeaturesJager_frms_ch1', 'FeaturesJager_sampen_ch1',
-# 	'FeaturesJager_fmed_ch2', 'FeaturesJager_fpeak_ch2', 
-# 	'FeaturesJager_frms_ch2', 'FeaturesJager_sampen_ch2',
-# 	'FeaturesJager_fmed_ch3', 'FeaturesJager_fpeak_ch3', 
-# 	'FeaturesJager_frms_ch3', 'FeaturesJager_sampen_ch3'
+fergus_features = [
+	'Hypertension_None', 'Hypertension_no',
+	'Hypertension_yes', 'Diabetes_None',
+	'Diabetes_no', 'Diabetes_yes',
+	'Placental_position_None', 'Placental_position_end',
+	'Placental_position_front', 'Bleeding_first_trimester_None',
+	'Bleeding_first_trimester_no', 'Bleeding_first_trimester_yes',
+	'Bleeding_second_trimester_None', 'Bleeding_second_trimester_no',
+	'Bleeding_second_trimester_yes', 'Funneling_None',
+	'Funneling_negative', 'Funneling_positive',
+	'Smoker_None', 'Smoker_no', 'Smoker_yes',
+	'Weight', 'Rectime', 'Age', 'Parity', 'Abortions',
+	'FeaturesJager_fmed_ch1', 'FeaturesJager_fpeak_ch1', 
+	'FeaturesJager_frms_ch1', 'FeaturesJager_sampen_ch1',
+	'FeaturesJager_fmed_ch2', 'FeaturesJager_fpeak_ch2', 
+	'FeaturesJager_frms_ch2', 'FeaturesJager_sampen_ch2',
+	'FeaturesJager_fmed_ch3', 'FeaturesJager_fpeak_ch3', 
+	'FeaturesJager_frms_ch3', 'FeaturesJager_sampen_ch3'
 
-# ]
+]
 
-# results['fergus2013']= study_fergus_2013(X[[c for c in X.columns if c in fergus_features]], y)
+results['fergus2013']= study_fergus_2013(X[[c for c in X.columns if c in fergus_features]], y)
 
-# print("FERGUS 2013")
-# for r in results['fergus2013']:
-#     if "auc" in r:
-#         print(r, results['fergus2013'][r])
+print("FERGUS 2013")
+for r in results['fergus2013']:
+    if "auc" in r:
+        print(r, results['fergus2013'][r])
 
 idowu_features = [
 	'FeaturesJager_fmed_ch1', 'FeaturesJager_fpeak_ch1', 
