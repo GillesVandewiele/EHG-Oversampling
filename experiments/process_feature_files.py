@@ -172,7 +172,7 @@ for col in joined_features.columns[joined_features.isnull().sum() > 0]:
     joined_features[col] = joined_features[col].fillna(joined_features[col].mean())
     
 ttb = joined_features['TimeToBirth_ch1']
-feature_matrix = joined_features.drop(['TimeToBirth_ch3', 'TimeToBirth_ch2', 'TimeToBirth_ch1', 'Gestation', 
+feature_matrix = joined_features.drop(['TimeToBirth_ch3', 'TimeToBirth_ch2', 'TimeToBirth_ch1', 
                                        'RecID', 'channel', 'id'], axis=1)
 
 X= feature_matrix.reset_index(drop=True)

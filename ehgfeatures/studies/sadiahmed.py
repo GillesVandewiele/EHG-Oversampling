@@ -13,6 +13,8 @@ import pyswarms as ps
 
 import json
 
+from collections import Counter
+
 sadiahmed_features= ['FeaturesSadiAhmed_emd_3_n_peaks_ch1',
                         'FeaturesSadiAhmed_emd_3_fwh_peak_freq_ch1',
                         'FeaturesSadiAhmed_emd_3_gap_ch1',
@@ -52,7 +54,25 @@ def evaluate(pipeline, X, y, validator):
     return preds
 
 def study_sadiahmed(features, target, preprocessing=StandardScaler(), grid=True, random_seed=42, output_file='sadiahmed_results.json'):
-    features= features.loc[:,sadiahmed_features]
+    features = features.loc[:,sadiahmed_features+['Rectime', 'Gestation']]
+    mask = (features['Rectime'] >= 27) & (features['Rectime'] <= 32)
+    features = features.loc[mask, :]
+    target = target.loc[mask]
+    
+    term_ix = np.arange(len(target), dtype=int)[target == 1]
+    preterm_ix = np.arange(len(target), dtype=int)[target == 0]
+
+    term_diffs = list(features.iloc[term_ix]['Gestation'] - features.iloc[term_ix]['Rectime'])
+    preterm_diffs = list(features.iloc[preterm_ix]['Gestation'] - features.iloc[preterm_ix]['Rectime'])
+    
+    features = features.drop(['Rectime', 'Gestation'], axis=1)
+
+    # These indices seem to best resemble the reported mean and stddev...
+    term_sample = list(term_ix[np.argsort(term_diffs)[10:25]])
+    preterm_sample = list(preterm_ix[np.argsort(preterm_diffs)[2:17]])
+
+    features = features.iloc[term_sample + preterm_sample, :]
+    target = target.iloc[term_sample + preterm_sample]
 
     results= {}
     base_classifier= SVC(kernel='rbf', random_state=random_seed, probability=True)
