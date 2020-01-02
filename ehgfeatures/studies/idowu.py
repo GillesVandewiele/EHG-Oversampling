@@ -32,7 +32,7 @@ def evaluate(pipeline, X, y, validator):
 
     return preds
 
-def study_idowu(features, target, preprocessing=StandardScaler(), grid=True, random_seed=42, output_file='fergus_2013_results.json'):
+def study_idowu(features, target, preprocessing=StandardScaler(), grid=True, random_seed=42, output_file='idowu.json'):
     results= {}
     base_classifier= RandomForestClassifier(random_state=random_seed)
     grid_search_params= {'max_depth': [3, 5, 10, None], 'min_samples_leaf': [1, 3, 5]}

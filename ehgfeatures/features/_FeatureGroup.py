@@ -24,4 +24,4 @@ class FeaturesAllEHG(FeatureGroup):
         #                            FeaturesJanjarasjitt(), FeaturesSadiAhmed(), 
         #                            FeaturesSubramaniam(), FeaturesJager(), FeaturesFergus(),
         #                            FeaturesTSFRESH(), FeaturesAhmed(), FeaturesRen()])
-        super().__init__(features=[FeaturesRen()])
+        super().__init__(features=[FeaturesRen(), FeaturesAhmed()])
