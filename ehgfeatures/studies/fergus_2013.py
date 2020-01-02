@@ -70,7 +70,6 @@ def study_fergus_2013(features, target, preprocessing=StandardScaler(), grid=Tru
     print('in sample: ', results['in_sample_auc'])
 
     # with incorrect oversampling
-    from collections import Counter
     X, y= SMOTE(random_state=random_seed).sample(features.values, target.values)
     X= pd.DataFrame(X, columns=features.columns)
     y= pd.Series(y)
