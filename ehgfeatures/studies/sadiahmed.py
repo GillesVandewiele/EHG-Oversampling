@@ -75,8 +75,8 @@ def study_sadiahmed(features, target, preprocessing=StandardScaler(), grid=True,
     target = target.iloc[term_sample + preterm_sample]
 
     results= {}
-    base_classifier= SVC(kernel='rbf', random_state=random_seed, probability=True)
-    grid_search_params= {'kernel': ['rbf'], 'C': [10**i for i in range(-4, 5)], 'probability': [True], 'random_state': [random_seed]}
+    base_classifier= SVC(kernel='linear', random_state=random_seed, probability=True)
+    grid_search_params= {'kernel': ['linear'], 'C': [10**i for i in range(-4, 5)], 'probability': [True], 'random_state': [random_seed]}
 
     # without oversampling
     classifier= base_classifier if not grid else GridSearchCV(base_classifier, grid_search_params, scoring='roc_auc')
