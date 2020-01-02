@@ -4,10 +4,11 @@ from tqdm import tqdm
 import os
 from sklearn.metrics import roc_auc_score
 from collections import defaultdict
+import glob
 
 features = []
-for file in tqdm(os.listdir('../examples/output')):
-    features.append(pd.read_csv('../examples/output/{}'.format(file), index_col=0))
+for file in tqdm(glob.glob(os.path.join('./output/', 'features_tpehg*.csv'))):
+    features.append(pd.read_csv('{}'.format(file), index_col=0))
 features = pd.concat(features)
 
 clin_features = ['id', 'channel', 'RecID', 'Gestation', 'Rectime', 'Age', 'Parity', 'Abortions', 'Weight', 'Hypertension', 'Diabetes', 'Placental_position', 'Bleeding_first_trimester', 'Bleeding_second_trimester', 'Funneling', 'Smoker']
@@ -40,14 +41,16 @@ feature_groups = [
     list(filter(lambda col: 'emd' in col and 'med_freq' in col, features.columns)),
     list(filter(lambda col: 'emd' in col and 'n_peaks' in col, features.columns)),
     list(filter(lambda col: 'FeaturesJanjarasjitt' in col, features.columns)),
-    ['FeaturesFergusFeatureMeanAbsoluteValues'], ['FeatureFractalDimensionHigushi'], 
+    list(filter(lambda col: 'FeatureFractalDimensionHigushi' in col, features.columns)),
+    list(filter(lambda col: 'FeatureDFA' in col, features.columns)),
+    ['FeaturesFergusFeatureMeanAbsoluteValues'], 
     ['FeaturesJager_fpeak'], ['FeaturesJager_frms'], ['FeaturesFergusFeatureWaveletLength'], 
     ['FeaturesFergusFeatureAvgAmplitudeChange'], ['FeaturesJager_fmed'],
     ['FeaturesFergusFeatureVarianceAbsoluteValue'], 
-    ['FeaturesFergusFeatureSumAbsoluteValues'], ['FeatureDFA'], 
+    ['FeaturesFergusFeatureSumAbsoluteValues'], 
     ['FeaturesFergusFeatureMaxFractalLength'], ['FeaturesFergusFeatureLogDetector'], 
-    ['FeaturesJager_sampen'], ['FeaturesJager_max_lyap'],
-    ['FeaturesJager_ac_zero'], ['FeaturesJager_corr_dim'],
+    ['FeaturesJager_sampen'], #['FeaturesJager_max_lyap'],
+    #['FeaturesJager_ac_zero'], ['FeaturesJager_corr_dim'],
     list(filter(lambda col: 'TSFRESH' in col, features.columns)),
 ]
 
