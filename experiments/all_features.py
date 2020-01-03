@@ -13,9 +13,9 @@ import os
 
 if __name__ == '__main__':
     
-    done = set([x.split('.')[0].split('_')[1] for x in os.listdir('output')])
+    done = set([x.split('.')[0].split('_')[1] for x in os.listdir('output') if 'features_tpehg' in x])
     
-    DATA_PATH= '/home/gykovacs/workspaces/ehg/physionet.org/files/tpehgdb/1.0.1/tpehgdb/'
+    DATA_PATH= 'data/tpehgdb/'
     
     ids, signals, all_clin_names, all_clin_values = get_signals(DATA_PATH, n_signals=-1)
     
