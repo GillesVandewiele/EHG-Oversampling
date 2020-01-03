@@ -6,17 +6,27 @@ from sklearn.metrics import roc_auc_score
 from collections import defaultdict
 import glob
 
-features = []
-for file in tqdm(glob.glob(os.path.join('./output/', 'features_tpehg*.csv'))):
-    features.append(pd.read_csv('{}'.format(file), index_col=0))
-features = pd.concat(features)
 
+def bootstrap_auc(y, x, repeat=10000):
+    aucs = []
+    for _ in range(repeat):
+        sampled_ix = np.random.choice(range(len(x)), replace=True, size=len(x))
+        x_sampled = x[sampled_ix]
+        y_sampled = y[sampled_ix]
+        aucs.append(roc_auc_score(y_sampled, x_sampled))
+    return aucs
+
+# Read in our data
+features = pd.read_csv('output/raw_features.csv')
+
+# Do a bit of processing of the clinical features
 clin_features = ['id', 'channel', 'RecID', 'Gestation', 'Rectime', 'Age', 'Parity', 'Abortions', 'Weight', 'Hypertension', 'Diabetes', 'Placental_position', 'Bleeding_first_trimester', 'Bleeding_second_trimester', 'Funneling', 'Smoker']
 features['Gestation'] = features['Gestation'].astype(float)
 features['Rectime'] = features['Rectime'].astype(float)
 features['TimeToBirth'] = features['Gestation'] - features['Rectime']
 features['Term'] = features['Gestation'] >= 37
 
+# Divide data into different cohorts
 early = features[features['Rectime'] <= 26]
 late = features[features['Rectime'] >= 26]
 term = features[features['Gestation'] >= 37]
@@ -26,6 +36,7 @@ early_preterm = early[early['Gestation'] < 37]
 late_term = late[late['Gestation'] >= 37]
 late_preterm = late[late['Gestation'] < 37]
 
+# Create a list per group of similar features
 feature_groups = [
     list(filter(lambda col: 'emd' in col and 'Yule_Walker' in col, features.columns)),
     list(filter(lambda col: 'emd' in col and 'Fractal' in col, features.columns)),
@@ -54,14 +65,15 @@ feature_groups = [
     list(filter(lambda col: 'TSFRESH' in col, features.columns)),
 ]
 
+# Sanity check: does the printed set only contain clinical features?
 included = set()
 for group in feature_groups:
     included = included.union(set(group))
 print(set(features.columns) - included)
 
+# First, we determine the top features without bootstrapping
 all_features_aucs = []
-
-for group in feature_groups[:-1]:
+for group in tqdm(feature_groups[:-1]):
     all_aucs = defaultdict(dict)
     for channel in [1, 2, 3]:
         channel_features = features[features['channel'] == channel]
@@ -84,7 +96,11 @@ for group in feature_groups[:-1]:
 
     best_feature, max_auc = None, 0
     for feature in all_aucs:
-        agg_auc = np.mean([all_aucs[feature][1]['all'], all_aucs[feature][2]['all'], all_aucs[feature][3]['all']])
+        agg_auc = np.mean([
+            np.mean(all_aucs[feature][1]['all']), 
+            np.mean(all_aucs[feature][2]['all']), 
+            np.mean(all_aucs[feature][3]['all'])
+        ])
         if abs(agg_auc - 0.5) > max_auc:
             max_auc = abs(agg_auc - 0.5)
             best_feature = feature
@@ -92,18 +108,68 @@ for group in feature_groups[:-1]:
     all_features_aucs.append((max_auc, best_feature, all_aucs[best_feature]))
 
 top_features = sorted(all_features_aucs, key=lambda x: -x[0])[:10]
-for _, best_feature, all_aucs in top_features:
+
+# Now apply bootstrapping for each of the top features to generate CI's
+for _, best_feature, _ in top_features:
+
+    all_aucs = {}
+    for channel in [1, 2, 3]:
+        channel_features = features[features['channel'] == channel]
+
+        early = channel_features[channel_features['Rectime'] <= 26]
+        late = channel_features[channel_features['Rectime'] >= 26]
+        term = channel_features[channel_features['Gestation'] >= 37]
+        preterm = channel_features[channel_features['Gestation'] < 37]
+        early_term = early[early['Gestation'] >= 37]
+        early_preterm = early[early['Gestation'] < 37]
+        late_term = late[late['Gestation'] >= 37]
+        late_preterm = late[late['Gestation'] < 37]
+
+        all_auc = bootstrap_auc(channel_features['Term'].values, channel_features[best_feature].values)
+        early_auc = bootstrap_auc(early['Term'].values, early[best_feature].values)
+        late_auc = bootstrap_auc(late['Term'].values, late[best_feature].values)
+
+        all_aucs[channel] = {'all': all_auc, 'early': early_auc, 'late': late_auc}
+
     print(best_feature)
     print(
-        '{} & {} & {} & {} & {} & {} & {} & {} & {} \\\\'.format(
-            np.around(all_aucs[1]['all'] * 100, 1),
-            np.around(all_aucs[1]['early'] * 100, 1),
-            np.around(all_aucs[1]['late'] * 100, 1),
-            np.around(all_aucs[2]['all'] * 100, 1),
-            np.around(all_aucs[2]['early'] * 100, 1),
-            np.around(all_aucs[2]['late'] * 100, 1),
-            np.around(all_aucs[3]['all'] * 100, 1),
-            np.around(all_aucs[3]['early'] * 100, 1),
-            np.around(all_aucs[3]['late'] * 100, 1)
+        '{} [{}-{}] & {} [{}-{}] & {} [{}-{}] & {} [{}-{}] & {} [{}-{}] & {} [{}-{}] & {} [{}-{}] & {} [{}-{}] & {} [{}-{}] \\\\'.format(
+            np.around(np.mean(all_aucs[1]['all']) * 100, 1),
+            np.around((np.mean(all_aucs[1]['all']) - (np.std(all_aucs[1]['all']) * 1.96)) * 100 , 1),
+            np.around((np.mean(all_aucs[1]['all']) + (np.std(all_aucs[1]['all']) * 1.96)) * 100 , 1),
+
+            np.around(np.mean(all_aucs[1]['early']) * 100, 1),
+            np.around((np.mean(all_aucs[1]['early']) - (np.std(all_aucs[1]['early']) * 1.96)) * 100 , 1),
+            np.around((np.mean(all_aucs[1]['early']) + (np.std(all_aucs[1]['early']) * 1.96)) * 100 , 1),
+
+            np.around(np.mean(all_aucs[1]['late']) * 100, 1),
+            np.around((np.mean(all_aucs[1]['late']) - (np.std(all_aucs[1]['late']) * 1.96)) * 100 , 1),
+            np.around((np.mean(all_aucs[1]['late']) + (np.std(all_aucs[1]['late']) * 1.96)) * 100 , 1),
+
+
+            np.around(np.mean(all_aucs[2]['all']) * 100, 1),
+            np.around((np.mean(all_aucs[2]['all']) - (np.std(all_aucs[2]['all']) * 1.96)) * 100 , 1),
+            np.around((np.mean(all_aucs[2]['all']) + (np.std(all_aucs[2]['all']) * 1.96)) * 100 , 1),
+
+            np.around(np.mean(all_aucs[2]['early']) * 100, 1),
+            np.around((np.mean(all_aucs[2]['early']) - (np.std(all_aucs[2]['early']) * 1.96)) * 100 , 1),
+            np.around((np.mean(all_aucs[2]['early']) + (np.std(all_aucs[2]['early']) * 1.96)) * 100 , 1),
+
+            np.around(np.mean(all_aucs[2]['late']) * 100, 1),
+            np.around((np.mean(all_aucs[2]['late']) - (np.std(all_aucs[2]['late']) * 1.96)) * 100 , 1),
+            np.around((np.mean(all_aucs[2]['late']) + (np.std(all_aucs[2]['late']) * 1.96)) * 100 , 1),
+
+
+            np.around(np.mean(all_aucs[3]['all']) * 100, 1),
+            np.around((np.mean(all_aucs[3]['all']) - (np.std(all_aucs[3]['all']) * 1.96)) * 100 , 1),
+            np.around((np.mean(all_aucs[3]['all']) + (np.std(all_aucs[3]['all']) * 1.96)) * 100 , 1),
+
+            np.around(np.mean(all_aucs[3]['early']) * 100, 1),
+            np.around((np.mean(all_aucs[3]['early']) - (np.std(all_aucs[3]['early']) * 1.96)) * 100 , 1),
+            np.around((np.mean(all_aucs[3]['early']) + (np.std(all_aucs[3]['early']) * 1.96)) * 100 , 1),
+
+            np.around(np.mean(all_aucs[3]['late']) * 100, 1),
+            np.around((np.mean(all_aucs[3]['late']) - (np.std(all_aucs[3]['late']) * 1.96)) * 100 , 1),
+            np.around((np.mean(all_aucs[3]['late']) + (np.std(all_aucs[3]['late']) * 1.96)) * 100 , 1),
         )
     )

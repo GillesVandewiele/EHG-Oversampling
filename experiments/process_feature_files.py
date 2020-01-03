@@ -17,7 +17,7 @@ from sklearn.preprocessing import StandardScaler
 
 import warnings; warnings.filterwarnings('ignore')
 
-PATH='output'
+PATH='examples/output'
 
 # Util classes & functions for feature selection
 class PipelineRFE(Pipeline):
@@ -173,12 +173,18 @@ for col in joined_features.columns[joined_features.isnull().sum() > 0]:
     
 ttb = joined_features['TimeToBirth_ch1']
 feature_matrix = joined_features.drop(['TimeToBirth_ch3', 'TimeToBirth_ch2', 'TimeToBirth_ch1', 
-                                       'RecID', 'channel', 'id'], axis=1)
+                                       'RecID', 'channel'], axis=1) # , 'id'
 
 X= feature_matrix.reset_index(drop=True)
 y= feature_matrix['Rectime'] + ttb >= 37
 
-X.to_csv(os.path.join(PATH, 'raw_features.csv'))
+features = ["id"]
+for col in ["FeaturesJager_ac_zero","FeaturesJager_max_lyap","FeaturesJager_corr_dim"]:
+    features.extend(['{}_ch1'.format(col), '{}_ch2'.format(col), '{}_ch3'.format(col)])
+
+X = X[features]
+
+X.to_csv(os.path.join(PATH, 'raw_features_with_id3.csv'))
 y.to_csv(os.path.join(PATH, 'target.csv'), index=False)
 
 # Apply first feature selection by removing highly correlated features
