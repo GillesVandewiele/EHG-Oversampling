@@ -13,6 +13,7 @@ from ehgfeatures.studies.hussain import study_hussain
 from ehgfeatures.studies.ahmed import study_ahmed
 from ehgfeatures.studies.ren import study_ren
 from ehgfeatures.studies.khan import study_khan
+from ehgfeatures.studies.peng import study_peng
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -133,16 +134,34 @@ results= {}
 #     if "auc" in r:
 #         print(r, results['ren'][r])
 
-khan_features = [
-	'FeaturesJager_fmed_ch1', 'FeaturesJager_lyap_ch1', 
-	'FeaturesJager_sampen_ch1', 'FeaturesJager_fmed_ch2', 
-	'FeaturesJager_lyap_ch2', 'FeaturesJager_sampen_ch2',
-	'FeaturesJager_fmed_ch3', 'FeaturesJager_lyap_ch3', 
-	'FeaturesJager_sampen_ch3',
+# khan_features = [
+# 	'FeaturesJager_fmed_ch1', 'FeaturesJager_lyap_ch1', 
+# 	'FeaturesJager_sampen_ch1', 'FeaturesJager_fmed_ch2', 
+# 	'FeaturesJager_lyap_ch2', 'FeaturesJager_sampen_ch2',
+# 	'FeaturesJager_fmed_ch3', 'FeaturesJager_lyap_ch3', 
+# 	'FeaturesJager_sampen_ch3',
+# ]
+
+# results['khan']= study_khan(X[[c for c in X.columns if c in khan_features or ('FeaturesAcharya' in c and 'SampleEntropy' in c)]], y)
+
+peng_features = [
+	'FeaturesJager_fmed_ch1', 'FeaturesJager_fpeak_ch1', 
+	'FeaturesJager_frms_ch1', 'FeaturesJager_sampen_ch1',
+	'FeaturesJager_fmed_ch2', 'FeaturesJager_fpeak_ch2', 
+	'FeaturesJager_frms_ch2', 'FeaturesJager_sampen_ch2',
+	'FeaturesJager_fmed_ch3', 'FeaturesJager_fpeak_ch3', 
+	'FeaturesJager_frms_ch3', 'FeaturesJager_sampen_ch3'
+
+	'FeaturesJager_ac_zero_ch1', 'FeaturesJager_ac_zero_ch2', 
+	'FeaturesJager_ac_zero_ch3', 'FeaturesJager_lyap_ch1', 
+	'FeaturesJager_lyap_ch2', 'FeaturesJager_lyap_ch3',
+	'FeaturesJager_corr_dim_ch1', 'FeaturesJager_corr_dim_ch2',
+	'FeaturesJager_corr_dim_ch3',
+
+	'Rectime'
 ]
 
-print([c for c in X.columns if c in khan_features or ('FeaturesAcharya' in c and 'SampleEntropy' in c)])
-results['khan']= study_khan(X[[c for c in X.columns if c in khan_features or ('FeaturesAcharya' in c and 'SampleEntropy' in c)]], y)
+results['peng']= study_peng(X[[c for c in X.columns if c in peng_features or 'YuleWalker' in c]], y)
 
 all_results= pd.DataFrame(results).T
 all_results= all_results[[c for c in all_results.columns if 'auc' in c]].T
