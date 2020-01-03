@@ -10,6 +10,8 @@ from ehgfeatures.studies.fergus import study_fergus
 from ehgfeatures.studies.fergus_2013 import study_fergus_2013
 from ehgfeatures.studies.idowu import study_idowu
 from ehgfeatures.studies.hussain import study_hussain
+from ehgfeatures.studies.ahmed import study_ahmed
+from ehgfeatures.studies.ren import study_ren
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -89,33 +91,47 @@ results= {}
 #         print(r, results['idowu'][r])
 
 
-husain_features = [
-	'Hypertension_None', 'Hypertension_no',
-	'Hypertension_yes', 'Diabetes_None',
-	'Diabetes_no', 'Diabetes_yes',
-	'Placental_position_None', 'Placental_position_end',
-	'Placental_position_front', 'Bleeding_first_trimester_None',
-	'Bleeding_first_trimester_no', 'Bleeding_first_trimester_yes',
-	'Bleeding_second_trimester_None', 'Bleeding_second_trimester_no',
-	'Bleeding_second_trimester_yes', 'Funneling_None',
-	'Funneling_negative', 'Funneling_positive',
-	'Smoker_None', 'Smoker_no', 'Smoker_yes',
-	'Weight', 'Rectime', 'Age', 'Parity', 'Abortions',
-	'FeaturesJager_fmed_ch1', 'FeaturesJager_fpeak_ch1', 
-	'FeaturesJager_frms_ch1', 'FeaturesJager_sampen_ch1',
-	'FeaturesJager_fmed_ch2', 'FeaturesJager_fpeak_ch2', 
-	'FeaturesJager_frms_ch2', 'FeaturesJager_sampen_ch2',
-	'FeaturesJager_fmed_ch3', 'FeaturesJager_fpeak_ch3', 
-	'FeaturesJager_frms_ch3', 'FeaturesJager_sampen_ch3'
+# husain_features = [
+# 	'Hypertension_None', 'Hypertension_no',
+# 	'Hypertension_yes', 'Diabetes_None',
+# 	'Diabetes_no', 'Diabetes_yes',
+# 	'Placental_position_None', 'Placental_position_end',
+# 	'Placental_position_front', 'Bleeding_first_trimester_None',
+# 	'Bleeding_first_trimester_no', 'Bleeding_first_trimester_yes',
+# 	'Bleeding_second_trimester_None', 'Bleeding_second_trimester_no',
+# 	'Bleeding_second_trimester_yes', 'Funneling_None',
+# 	'Funneling_negative', 'Funneling_positive',
+# 	'Smoker_None', 'Smoker_no', 'Smoker_yes',
+# 	'Weight', 'Rectime', 'Age', 'Parity', 'Abortions',
+# 	'FeaturesJager_fmed_ch1', 'FeaturesJager_fpeak_ch1', 
+# 	'FeaturesJager_frms_ch1', 'FeaturesJager_sampen_ch1',
+# 	'FeaturesJager_fmed_ch2', 'FeaturesJager_fpeak_ch2', 
+# 	'FeaturesJager_frms_ch2', 'FeaturesJager_sampen_ch2',
+# 	'FeaturesJager_fmed_ch3', 'FeaturesJager_fpeak_ch3', 
+# 	'FeaturesJager_frms_ch3', 'FeaturesJager_sampen_ch3'
 
-]
+# ]
 
-results['husain']= study_hussain(X[[c for c in X.columns if c in husain_features]], y)
+# results['husain']= study_hussain(X[[c for c in X.columns if c in husain_features]], y)
 
-print("HUSAIN")
-for r in results['husain']:
+# print("HUSAIN")
+# for r in results['husain']:
+#     if "auc" in r:
+#         print(r, results['husain'][r])
+
+# results['ahmed']= study_ahmed(X[[c for c in X.columns if "FeaturesAhmed" in c]], y)
+
+# print("AHMED")
+# for r in results['ahmed']:
+#     if "auc" in r:
+#         print(r, results['ahmed'][r])
+
+results['ren']= study_ren(X[[c for c in X.columns if "FeaturesRen" in c]], y)
+
+print("REN")
+for r in results['ren']:
     if "auc" in r:
-        print(r, results['husain'][r])
+        print(r, results['ren'][r])
 
 all_results= pd.DataFrame(results).T
 all_results= all_results[[c for c in all_results.columns if 'auc' in c]].T

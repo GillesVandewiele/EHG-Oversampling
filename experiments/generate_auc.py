@@ -20,7 +20,7 @@ def bootstrap_auc(y, x, repeat=10000):
 features = pd.read_csv('output/raw_features.csv')
 
 # Do a bit of processing of the clinical features
-clin_features = ['id', 'channel', 'RecID', 'Gestation', 'Rectime', 'Age', 'Parity', 'Abortions', 'Weight', 'Hypertension', 'Diabetes', 'Placental_position', 'Bleeding_first_trimester', 'Bleeding_second_trimester', 'Funneling', 'Smoker']
+clin_features = ['id', 'RecID', 'Gestation', 'Rectime', 'Age', 'Parity', 'Abortions', 'Weight', 'Hypertension', 'Diabetes', 'Placental_position', 'Bleeding_first_trimester', 'Bleeding_second_trimester', 'Funneling', 'Smoker']
 features['Gestation'] = features['Gestation'].astype(float)
 features['Rectime'] = features['Rectime'].astype(float)
 features['TimeToBirth'] = features['Gestation'] - features['Rectime']
@@ -52,6 +52,8 @@ feature_groups = [
     list(filter(lambda col: 'emd' in col and 'med_freq' in col, features.columns)),
     list(filter(lambda col: 'emd' in col and 'n_peaks' in col, features.columns)),
     list(filter(lambda col: 'FeaturesJanjarasjitt' in col, features.columns)),
+    list(filter(lambda col: 'FeaturesAhmed' in col, features.columns)),
+    list(filter(lambda col: 'FeaturesRen' in col, features.columns)),
     list(filter(lambda col: 'FeatureFractalDimensionHigushi' in col, features.columns)),
     list(filter(lambda col: 'FeatureDFA' in col, features.columns)),
     ['FeaturesFergusFeatureMeanAbsoluteValues'], 
@@ -60,15 +62,21 @@ feature_groups = [
     ['FeaturesFergusFeatureVarianceAbsoluteValue'], 
     ['FeaturesFergusFeatureSumAbsoluteValues'], 
     ['FeaturesFergusFeatureMaxFractalLength'], ['FeaturesFergusFeatureLogDetector'], 
-    ['FeaturesJager_sampen'], #['FeaturesJager_max_lyap'],
-    #['FeaturesJager_ac_zero'], ['FeaturesJager_corr_dim'],
+    ['FeaturesJager_sampen'], ['FeaturesJager_max_lyap'],
+    ['FeaturesJager_ac_zero'], ['FeaturesJager_corr_dim'],
     list(filter(lambda col: 'TSFRESH' in col, features.columns)),
 ]
 
 # Sanity check: does the printed set only contain clinical features?
 included = set()
 for group in feature_groups:
-    included = included.union(set(group))
+    for x in group:
+        if x[-3:-1] == 'ch':
+            included.add(x)
+        else:
+            included.add(x+'_ch1')
+            included.add(x+'_ch2')
+            included.add(x+'_ch3')
 print(set(features.columns) - included)
 
 # First, we determine the top features without bootstrapping
@@ -76,7 +84,7 @@ all_features_aucs = []
 for group in tqdm(feature_groups[:-1]):
     all_aucs = defaultdict(dict)
     for channel in [1, 2, 3]:
-        channel_features = features[features['channel'] == channel]
+        channel_features = features#[features['channel'] == channel]
 
         early = channel_features[channel_features['Rectime'] <= 26]
         late = channel_features[channel_features['Rectime'] >= 26]
@@ -87,10 +95,10 @@ for group in tqdm(feature_groups[:-1]):
         late_term = late[late['Gestation'] >= 37]
         late_preterm = late[late['Gestation'] < 37]
 
-        for feature in group:
-            all_auc = roc_auc_score(channel_features['Term'], channel_features[feature])
-            early_auc = roc_auc_score(early['Term'], early[feature])
-            late_auc = roc_auc_score(late['Term'], late[feature])
+        for feature in set([x[:-4] if x[-3:-1] == 'ch' else x for x in group]):
+            all_auc = roc_auc_score(channel_features['Term'], channel_features[feature+'_ch{}'.format(channel)])
+            early_auc = roc_auc_score(early['Term'], early[feature+'_ch{}'.format(channel)])
+            late_auc = roc_auc_score(late['Term'], late[feature+'_ch{}'.format(channel)])
 
             all_aucs[feature][channel] = {'all': all_auc, 'early': early_auc, 'late': late_auc}
 
@@ -107,14 +115,23 @@ for group in tqdm(feature_groups[:-1]):
 
     all_features_aucs.append((max_auc, best_feature, all_aucs[best_feature]))
 
-top_features = sorted(all_features_aucs, key=lambda x: -x[0])[:10]
+top_features = sorted(all_features_aucs, key=lambda x: -x[0])
 
 # Now apply bootstrapping for each of the top features to generate CI's
+done = []
 for _, best_feature, _ in top_features:
+
+    if len(done) == 10:
+        break
+
+    if best_feature in done:
+        continue
+
+    done.append(best_feature)
 
     all_aucs = {}
     for channel in [1, 2, 3]:
-        channel_features = features[features['channel'] == channel]
+        channel_features = features
 
         early = channel_features[channel_features['Rectime'] <= 26]
         late = channel_features[channel_features['Rectime'] >= 26]
@@ -125,9 +142,9 @@ for _, best_feature, _ in top_features:
         late_term = late[late['Gestation'] >= 37]
         late_preterm = late[late['Gestation'] < 37]
 
-        all_auc = bootstrap_auc(channel_features['Term'].values, channel_features[best_feature].values)
-        early_auc = bootstrap_auc(early['Term'].values, early[best_feature].values)
-        late_auc = bootstrap_auc(late['Term'].values, late[best_feature].values)
+        all_auc = bootstrap_auc(channel_features['Term'].values, channel_features[best_feature+'_ch{}'.format(channel)].values)
+        early_auc = bootstrap_auc(early['Term'].values, early[best_feature+'_ch{}'.format(channel)].values)
+        late_auc = bootstrap_auc(late['Term'].values, late[best_feature+'_ch{}'.format(channel)].values)
 
         all_aucs[channel] = {'all': all_auc, 'early': early_auc, 'late': late_auc}
 
