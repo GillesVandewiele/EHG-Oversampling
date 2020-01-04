@@ -38,7 +38,21 @@ results= {}
 #     if "auc" in r:
 #         print(r, results['hosseinzahde'][r])
 
-# results['fergus']= study_fergus(X[[c for c in X.columns if "Fergus" in c]], y, grid=False)
+fergus_features = [
+ 	'Hypertension_None', 'Hypertension_no',
+ 	'Hypertension_yes', 'Diabetes_None',
+ 	'Diabetes_no', 'Diabetes_yes',
+ 	'Placental_position_None', 'Placental_position_end',
+ 	'Placental_position_front', 'Bleeding_first_trimester_None',
+ 	'Bleeding_first_trimester_no', 'Bleeding_first_trimester_yes',
+ 	'Bleeding_second_trimester_None', 'Bleeding_second_trimester_no',
+ 	'Bleeding_second_trimester_yes', 'Funneling_None',
+ 	'Funneling_negative', 'Funneling_positive',
+ 	'Smoker_None', 'Smoker_no', 'Smoker_yes',
+ 	'Weight', 'Rectime', 'Age', 'Parity', 'Abortions'
+] + [c for c in X.columns if "Fergus" in c]
+
+results['fergus']= study_fergus(X[fergus_features], y, grid=False)
 
 # print("FERGUS")
 # for r in results['fergus']:
@@ -63,7 +77,6 @@ results= {}
 # 	'FeaturesJager_frms_ch2', 'FeaturesJager_sampen_ch2',
 # 	'FeaturesJager_fmed_ch3', 'FeaturesJager_fpeak_ch3', 
 # 	'FeaturesJager_frms_ch3', 'FeaturesJager_sampen_ch3'
-
 # ]
 
 # results['fergus2013']= study_fergus_2013(X[[c for c in X.columns if c in fergus_features]], y)
