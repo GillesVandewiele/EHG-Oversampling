@@ -32,7 +32,7 @@ def evaluate(pipeline, X, y, validator):
 
     return preds
 
-def study_khan(features, target, preprocessing=StandardScaler(), grid=True, random_seed=42, output_file='idowu.json'):
+def study_khan(features, target, preprocessing=StandardScaler(), grid=True, random_seed=42, output_file='khan.json'):
     results= {}
     base_classifier= SVC(kernel='rbf', probability=True, random_state=random_seed)
     grid_search_params= {'C': [10**i for i in range(-4, 5)]}
@@ -40,7 +40,7 @@ def study_khan(features, target, preprocessing=StandardScaler(), grid=True, rand
     np.random.seed(random_seed)
 
     # without oversampling
-    classifier= base_classifier if not grid else GridSearchCV(base_classifier, grid_search_params, scoring='roc_auc')
+    classifier= base_classifier if not grid else GridSearchCV(base_classifier, grid_search_params, scoring='accuracy')
     pipeline= classifier if not preprocessing else Pipeline([('preprocessing', preprocessing), ('classifier', classifier)])
     validator= StratifiedKFold(n_splits=5, random_state= random_seed)
 
@@ -51,7 +51,7 @@ def study_khan(features, target, preprocessing=StandardScaler(), grid=True, rand
     print('without oversampling: ', results['without_oversampling_auc'])
 
     # with correct oversampling
-    classifier= base_classifier if not grid else GridSearchCV(base_classifier, grid_search_params, scoring='roc_auc')
+    classifier= base_classifier if not grid else GridSearchCV(base_classifier, grid_search_params, scoring='accuracy')
     classifier= OversamplingClassifier(ADASYN(random_state=random_seed), classifier)
     pipeline= classifier if not preprocessing else Pipeline([('preprocessing', preprocessing), ('classifier', classifier)])
     validator= StratifiedKFold(n_splits=5, random_state= random_seed)
@@ -74,7 +74,7 @@ def study_khan(features, target, preprocessing=StandardScaler(), grid=True, rand
     X= pd.DataFrame(X, columns=features.columns)
     y= pd.Series(y)
 
-    classifier= base_classifier if not grid else GridSearchCV(base_classifier, grid_search_params, scoring='roc_auc')
+    classifier= base_classifier if not grid else GridSearchCV(base_classifier, grid_search_params, scoring='accuracy')
     pipeline= classifier if not preprocessing else Pipeline([('preprocessing', preprocessing), ('classifier', classifier)])
     validator= StratifiedKFold(n_splits=5, random_state=random_seed)
 

@@ -178,13 +178,7 @@ feature_matrix = joined_features.drop(['TimeToBirth_ch3', 'TimeToBirth_ch2', 'Ti
 X= feature_matrix.reset_index(drop=True)
 y= feature_matrix['Rectime'] + ttb >= 37
 
-features = ["id"]
-for col in ["FeaturesJager_ac_zero","FeaturesJager_max_lyap","FeaturesJager_corr_dim"]:
-    features.extend(['{}_ch1'.format(col), '{}_ch2'.format(col), '{}_ch3'.format(col)])
-
-X = X[features]
-
-X.to_csv(os.path.join(PATH, 'raw_features_with_id3.csv'))
+X.to_csv(os.path.join(PATH, 'raw_features.csv'))
 y.to_csv(os.path.join(PATH, 'target.csv'), index=False)
 
 # Apply first feature selection by removing highly correlated features
@@ -193,7 +187,4 @@ feature_matrix = feature_matrix.drop(useless_features, axis=1)
 
 # Create our X and our y (term/preterm)
 X = feature_matrix.reset_index(drop=True)
-#y = feature_matrix['Rectime'] + ttb >= 37
-
 X.to_csv(os.path.join(PATH, 'cleaned_features.csv'))
-#y.to_csv(os.path.join(PATH, 'target.csv'), index=False)

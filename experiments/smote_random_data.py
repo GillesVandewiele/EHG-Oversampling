@@ -4,6 +4,9 @@ from smote_variants import SMOTE
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_auc_score
 
+import logging
+logging.getLogger('smote_variants').disabled = True
+
 np.random.seed(42)
 
 # Generate random data
