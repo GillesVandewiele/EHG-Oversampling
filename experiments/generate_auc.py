@@ -150,43 +150,34 @@ for _, best_feature, _ in top_features:
 
     print(best_feature)
     print(
-        '{} [{}-{}] & {} [{}-{}] & {} [{}-{}] & {} [{}-{}] & {} [{}-{}] & {} [{}-{}] & {} [{}-{}] & {} [{}-{}] & {} [{}-{}] \\\\'.format(
+        '${} \pm {}$ & ${} \pm {}$ & ${} \pm {}$ & ${} \pm {}$ & ${} \pm {}$ & ${} \pm {}$ & ${} \pm {}$ & ${} \pm {}$ & ${} \pm {}$ \\\\'.format(
             np.around(np.mean(all_aucs[1]['all']) * 100, 1),
-            np.around((np.mean(all_aucs[1]['all']) - (np.std(all_aucs[1]['all']) * 1.96)) * 100 , 1),
-            np.around((np.mean(all_aucs[1]['all']) + (np.std(all_aucs[1]['all']) * 1.96)) * 100 , 1),
+            np.around(np.std(all_aucs[1]['all']) * 100, 1),
 
             np.around(np.mean(all_aucs[1]['early']) * 100, 1),
-            np.around((np.mean(all_aucs[1]['early']) - (np.std(all_aucs[1]['early']) * 1.96)) * 100 , 1),
-            np.around((np.mean(all_aucs[1]['early']) + (np.std(all_aucs[1]['early']) * 1.96)) * 100 , 1),
+            np.around(np.std(all_aucs[1]['early']) * 100, 1),
 
             np.around(np.mean(all_aucs[1]['late']) * 100, 1),
-            np.around((np.mean(all_aucs[1]['late']) - (np.std(all_aucs[1]['late']) * 1.96)) * 100 , 1),
-            np.around((np.mean(all_aucs[1]['late']) + (np.std(all_aucs[1]['late']) * 1.96)) * 100 , 1),
+            np.around(np.std(all_aucs[1]['late']) * 100, 1),
 
 
             np.around(np.mean(all_aucs[2]['all']) * 100, 1),
-            np.around((np.mean(all_aucs[2]['all']) - (np.std(all_aucs[2]['all']) * 1.96)) * 100 , 1),
-            np.around((np.mean(all_aucs[2]['all']) + (np.std(all_aucs[2]['all']) * 1.96)) * 100 , 1),
+            np.around(np.std(all_aucs[2]['all']) * 100, 1),
 
             np.around(np.mean(all_aucs[2]['early']) * 100, 1),
-            np.around((np.mean(all_aucs[2]['early']) - (np.std(all_aucs[2]['early']) * 1.96)) * 100 , 1),
-            np.around((np.mean(all_aucs[2]['early']) + (np.std(all_aucs[2]['early']) * 1.96)) * 100 , 1),
+            np.around(np.std(all_aucs[2]['early']) * 100, 1),
 
             np.around(np.mean(all_aucs[2]['late']) * 100, 1),
-            np.around((np.mean(all_aucs[2]['late']) - (np.std(all_aucs[2]['late']) * 1.96)) * 100 , 1),
-            np.around((np.mean(all_aucs[2]['late']) + (np.std(all_aucs[2]['late']) * 1.96)) * 100 , 1),
+            np.around(np.std(all_aucs[2]['late']) * 100, 1),
 
 
             np.around(np.mean(all_aucs[3]['all']) * 100, 1),
-            np.around((np.mean(all_aucs[3]['all']) - (np.std(all_aucs[3]['all']) * 1.96)) * 100 , 1),
-            np.around((np.mean(all_aucs[3]['all']) + (np.std(all_aucs[3]['all']) * 1.96)) * 100 , 1),
+            np.around(np.std(all_aucs[3]['all']) * 100, 1),
 
             np.around(np.mean(all_aucs[3]['early']) * 100, 1),
-            np.around((np.mean(all_aucs[3]['early']) - (np.std(all_aucs[3]['early']) * 1.96)) * 100 , 1),
-            np.around((np.mean(all_aucs[3]['early']) + (np.std(all_aucs[3]['early']) * 1.96)) * 100 , 1),
+            np.around(np.std(all_aucs[3]['early']) * 100, 1),
 
             np.around(np.mean(all_aucs[3]['late']) * 100, 1),
-            np.around((np.mean(all_aucs[3]['late']) - (np.std(all_aucs[3]['late']) * 1.96)) * 100 , 1),
-            np.around((np.mean(all_aucs[3]['late']) + (np.std(all_aucs[3]['late']) * 1.96)) * 100 , 1),
+            np.around(np.std(all_aucs[3]['late']) * 100, 1),
         )
     )

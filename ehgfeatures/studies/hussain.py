@@ -54,18 +54,18 @@ def study_hussain(features, target, preprocessing=None, grid=True, random_seed=4
     np.random.seed(random_seed)
 
     # without oversampling
-    classifier= base_classifier if not grid else GridSearchCV(base_classifier, grid_search_params, scoring='roc_auc')
+    classifier= base_classifier if not grid else GridSearchCV(base_classifier, grid_search_params, scoring='accuracy')
     pipeline= classifier if not preprocessing else Pipeline([('preprocessing', preprocessing), ('classifier', classifier)])
     validator= StratifiedKFold(n_splits=5, random_state= random_seed)
 
     preds= evaluate(pipeline, features, target, validator)
-    results['without_oversampling_auc']= roc_auc_score(preds['label'].values, preds['prediction'].values)
+    results['without_oversampling_auc']= accuracy_score(preds['label'].values, preds['prediction'].values > 0.5)
     results['without_oversampling_details']= preds.to_dict()
 
     print('without oversampling: ', results['without_oversampling_auc'])
 
     # with correct oversampling
-    classifier= base_classifier if not grid else GridSearchCV(base_classifier, grid_search_params, scoring='roc_auc')
+    classifier= base_classifier if not grid else GridSearchCV(base_classifier, grid_search_params, scoring='accuracy')
     pipeline= classifier if not preprocessing else Pipeline([('preprocessing', preprocessing), ('classifier', classifier)])
     validator= StratifiedKFold(n_splits=5, random_state= random_seed)
 
@@ -98,21 +98,22 @@ def study_hussain(features, target, preprocessing=None, grid=True, random_seed=4
         preds[test_idx, 1]= y_test
         preds[test_idx, 2]= pipeline.predict_proba(X_test.values)[:,1]
 
-    results['with_oversampling_auc']= roc_auc_score(preds[:, 1], preds[:, 2])
+    results['with_oversampling_auc']= accuracy_score(preds[:, 1], preds[:, 2] > 0.5)
     #results['with_oversampling_details']= preds.to_dict()
     print('with oversampling: ', results['with_oversampling_auc'])
+    print(confusion_matrix(preds[:, 1], preds[:, 2] > 0.5))
 
     # in-sample evaluation
     classifier= base_classifier
     preds= classifier.fit(features.values, target.values).predict_proba(features.values)[:,1]
     preds= pd.DataFrame({'fold': 0, 'label': target.values, 'prediction': preds})
-    results['in_sample_auc']= roc_auc_score(preds['label'].values, preds['prediction'].values)
+    results['in_sample_auc']= accuracy_score(preds['label'].values, preds['prediction'].values > 0.5)
     results['in_sample_details']= preds.to_dict()
     print('in sample: ', results['in_sample_auc'])
 
     # with incorrect oversampling
     X, y = features, target
-    classifier= base_classifier if not grid else GridSearchCV(base_classifier, grid_search_params, scoring='roc_auc')
+    classifier= base_classifier if not grid else GridSearchCV(base_classifier, grid_search_params, scoring='accuracy')
     pipeline= classifier if not preprocessing else Pipeline([('preprocessing', preprocessing), ('classifier', classifier)])
     validator= StratifiedKFold(n_splits=5, random_state=random_seed)
 
@@ -145,9 +146,8 @@ def study_hussain(features, target, preprocessing=None, grid=True, random_seed=4
         preds[test_idx, 1]= y_test
         preds[test_idx, 2]= pipeline.predict_proba(X_test.values)[:,1]
 
-    results['incorrect_oversampling_auc']= roc_auc_score(preds[:, 1], preds[:, 2])
+    results['incorrect_oversampling_auc']= accuracy_score(preds[:, 1], preds[:, 2] > 0.5)
     print('incorrect oversampling: ', results['incorrect_oversampling_auc'])
-    print(confusion_matrix(preds[:, 1], preds[:, 2] > 0.5))
 
 
     json.dump(results, open(output_file, 'w'))

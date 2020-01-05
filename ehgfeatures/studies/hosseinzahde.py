@@ -3,7 +3,7 @@ from smote_variants import ADASYN, OversamplingClassifier
 from sklearn.svm import SVC
 from sklearn.model_selection import StratifiedKFold, GridSearchCV
 from sklearn.pipeline import Pipeline
-from sklearn.metrics import roc_auc_score
+from sklearn.metrics import roc_auc_score, accuracy_score
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier
 
@@ -45,24 +45,24 @@ def study_hosseinzahde(features, target, preprocessing=StandardScaler(), grid=Tr
     grid_search_params= {'kernel': ['rbf'], 'C': [10**i for i in range(-4, 5)], 'probability': [True], 'random_state': [random_seed]}
 
     # without oversampling
-    classifier= base_classifier if not grid else GridSearchCV(base_classifier, grid_search_params, scoring='roc_auc')
+    classifier= base_classifier if not grid else GridSearchCV(base_classifier, grid_search_params, scoring='accuracy')
     pipeline= classifier if not preprocessing else Pipeline([('preprocessing', preprocessing), ('classifier', classifier)])
     validator= StratifiedKFold(n_splits=10, random_state= random_seed)
 
     preds= evaluate(pipeline, features, target, validator)
-    results['without_oversampling_auc']= roc_auc_score(preds['label'].values, preds['prediction'].values)
+    results['without_oversampling_auc']= accuracy_score(preds['label'].values, preds['prediction'].values > 0.5)
     results['without_oversampling_details']= preds.to_dict()
 
     print('without oversampling: ', results['without_oversampling_auc'])
 
     # with correct oversampling
-    classifier= base_classifier if not grid else GridSearchCV(base_classifier, grid_search_params, scoring='roc_auc')
+    classifier= base_classifier if not grid else GridSearchCV(base_classifier, grid_search_params, scoring='accuracy')
     classifier= OversamplingClassifier(ADASYN(), classifier)
     pipeline= classifier if not preprocessing else Pipeline([('preprocessing', preprocessing), ('classifier', classifier)])
     validator= StratifiedKFold(n_splits=10, random_state= random_seed)
 
     preds= evaluate(classifier, features, target, validator)
-    results['with_oversampling_auc']= roc_auc_score(preds['label'].values, preds['prediction'].values)
+    results['with_oversampling_auc']= accuracy_score(preds['label'].values, preds['prediction'].values > 0.5)
     results['with_oversampling_details']= preds.to_dict()
     print('with oversampling: ', results['with_oversampling_auc'])
 
@@ -70,7 +70,7 @@ def study_hosseinzahde(features, target, preprocessing=StandardScaler(), grid=Tr
     classifier= base_classifier
     preds= classifier.fit(features.values, target.values).predict_proba(features.values)[:,1]
     preds= pd.DataFrame({'fold': 0, 'label': target.values, 'prediction': preds})
-    results['in_sample_auc']= roc_auc_score(preds['label'].values, preds['prediction'].values)
+    results['in_sample_auc']= accuracy_score(preds['label'].values, preds['prediction'].values > 0.5)
     results['in_sample_details']= preds.to_dict()
     print('in sample: ', results['in_sample_auc'])
 
@@ -79,12 +79,12 @@ def study_hosseinzahde(features, target, preprocessing=StandardScaler(), grid=Tr
     X= pd.DataFrame(X, columns=features.columns)
     y= pd.Series(y)
 
-    classifier= base_classifier if not grid else GridSearchCV(base_classifier, grid_search_params, scoring='roc_auc')
+    classifier= base_classifier if not grid else GridSearchCV(base_classifier, grid_search_params, scoring='accuracy')
     pipeline= classifier if not preprocessing else Pipeline([('preprocessing', preprocessing), ('classifier', classifier)])
     validator= StratifiedKFold(n_splits=10, random_state= random_seed)
 
     preds= evaluate(pipeline, X, y, validator)
-    results['incorrect_oversampling_auc']= roc_auc_score(preds['label'].values, preds['prediction'].values)
+    results['incorrect_oversampling_auc']= accuracy_score(preds['label'].values, preds['prediction'].values > 0.5)
     results['incorrect_oversampling_details']= preds.to_dict()
     print('incorrect oversampling: ', results['incorrect_oversampling_auc'])
 

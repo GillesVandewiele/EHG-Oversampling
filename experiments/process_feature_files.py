@@ -193,7 +193,4 @@ feature_matrix = feature_matrix.drop(useless_features, axis=1)
 
 # Create our X and our y (term/preterm)
 X = feature_matrix.reset_index(drop=True)
-#y = feature_matrix['Rectime'] + ttb >= 37
-
 X.to_csv(os.path.join(PATH, 'cleaned_features.csv'))
-#y.to_csv(os.path.join(PATH, 'target.csv'), index=False)

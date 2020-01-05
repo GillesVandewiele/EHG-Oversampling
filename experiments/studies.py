@@ -19,6 +19,9 @@ from ehgfeatures.studies.jagerlibensek import study_jagerlibensek
 import warnings
 warnings.filterwarnings('ignore')
 
+import logging
+logging.getLogger('smote_variants').disabled = True
+
 features= pd.read_csv('output/raw_features.csv')
 target= pd.read_csv('output/target.csv', header=None, index_col=None)
 
