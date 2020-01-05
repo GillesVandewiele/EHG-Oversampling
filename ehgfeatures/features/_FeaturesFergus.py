@@ -2,7 +2,8 @@ import logging
 
 from ._BaseFeatures import (FeatureSumAbsoluteValues, FeatureMeanAbsoluteValues, FeatureWaveletLength,
                             FeatureLogDetector, FeatureVarianceAbsoluteValue, FeatureMaxFractalLength,
-                            FeatureAvgAmplitudeChange, FeatureBase)
+                            FeatureAvgAmplitudeChange, FeatureBase, FeatureSumSquareValues, FeatureRootMeanSquare,
+                            FeaturePeakFrequency, FeatureMedianFrequency)
 
 __all__= ['FeaturesFergus']
 
@@ -23,11 +24,15 @@ class FeaturesFergus(FeatureBase):
         self.features = [
             FeatureSumAbsoluteValues(),
             FeatureMeanAbsoluteValues(),
+            FeatureSumSquareValues(),
             FeatureWaveletLength(),
             FeatureLogDetector(),
+            FeatureRootMeanSquare(),
             FeatureVarianceAbsoluteValue(),
             FeatureMaxFractalLength(),
-            FeatureAvgAmplitudeChange()
+            FeatureAvgAmplitudeChange(),
+            FeaturePeakFrequency(),
+            FeatureMedianFrequency()
         ]
 
     def n_features(self):

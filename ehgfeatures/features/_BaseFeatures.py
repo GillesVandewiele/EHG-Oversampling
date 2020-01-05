@@ -21,7 +21,13 @@ __all__= ['FeatureFractalDimensionHigushi',
             'FeatureStandardDeviation', 
             'FeatureDFA', 
             'FeatureAR_Yule_Walker',
-            'FeatureBase']
+            'FeatureBase',
+            'FeatureSumSquareValues',
+            'FeatureRootMeanSquare',
+            'FeatureVariance',
+            'FeatureSampleEntropy',
+            'FeaturePeakFrequency',
+            'FeatureMedianFrequency']
 
 class FeatureBase:
     def n_features(self):
@@ -174,6 +180,14 @@ class FeatureMeanAbsoluteValues(FeatureBase):
         logging.info("extracting %s" % self.__class__.__name__)
         return {self.__class__.__name__: np.mean(np.abs(signal))}
 
+class FeatureSumSquareValues(FeatureBase):
+    def n_features(self):
+        return 1
+    
+    def extract(self, signal):
+        logging.info("extracting %s" % self.__class__.__name__)
+        return {self.__class__.__name__: np.sum(signal**2)}
+
 class FeatureWaveletLength(FeatureBase):
     def n_features(self):
         return 1
@@ -188,7 +202,15 @@ class FeatureLogDetector(FeatureBase):
 
     def extract(self, signal):
         logging.info("extracting %s" % self.__class__.__name__)
-        return {self.__class__.__name__: np.exp(np.mean(np.log(np.abs(signal))))}
+        return {self.__class__.__name__: np.exp(np.mean(np.log(np.abs(signal) + 1e-5)))}
+
+class FeatureRootMeanSquare(FeatureBase):
+    def n_features(self):
+        return 1
+    
+    def extract(self, signal):
+        logging.info("extracting %s" % self.__class__.__name__)
+        return {self.__class__.__name__: np.sqrt(np.mean(signal**2))}
 
 class FeatureVarianceAbsoluteValue(FeatureBase):
     def n_features(self):
@@ -204,7 +226,7 @@ class FeatureMaxFractalLength(FeatureBase):
 
     def extract(self, signal):
         logging.info("extracting %s" % self.__class__.__name__)
-        return {self.__class__.__name__: np.log(np.sqrt(np.sum(np.power(signal[:-1] - signal[1:], 2))))}
+        return {self.__class__.__name__: np.log(np.sqrt(np.sum(np.power(signal[:-1] - signal[1:], 2))) + 1e-5)}
 
 class FeatureAvgAmplitudeChange(FeatureBase):
     def n_features(self):
@@ -214,6 +236,54 @@ class FeatureAvgAmplitudeChange(FeatureBase):
         logging.info("extracting %s" % self.__class__.__name__)
         return {self.__class__.__name__: np.mean(np.abs(signal[:-1] - signal[1:]))}
 
+class FeatureVariance(FeatureBase):
+    def n_features(self):
+        return 1
+
+    def extract(self, signal):
+        logging.info("extracting %s" % self.__class__.__name__)
+        return {self.__class__.__name__: np.var(signal)}
+
+class FeatureDiffAbsStdDev(FeatureBase):
+    def n_features(self):
+        return 1
+
+    def extract(self, signal):
+        logging.info("extracting %s" % self.__class__.__name__)
+        return {self.__class__.__name__: 1.0/len(signal) - np.mean((signal[1:] - signal[:-1])**2)}
+
+class FeaturePeakFrequency(FeatureBase):
+    def n_features(self):
+        return 1
+    
+    def extract(self, signal):
+        logging.info("extracting %s" % self.__class__.__name__)
+        P= np.fft.fft(signal)
+        return {self.__class__.__name__: np.argmax(np.abs(P))}
+
+class FeatureMedianFrequency(FeatureBase):
+    def n_features(self):
+        return 1
+    
+    def extract(self, signal):
+        logging.info("extracting %s" % self.__class__.__name__)
+        P= np.abs(np.fft.fft(signal))
+
+        lhs= 0
+        rhs= np.sum(P)
+
+        f_med= 0
+        smallest_diff= abs(lhs - rhs)
+
+        for i, p in enumerate(P):
+            lhs+= p
+            rhs-= p
+
+            if abs(lhs - rhs) < smallest_diff:
+                f_med= i
+                smallest_diff= abs(lhs - rhs)
+
+        return {self.__class__.__name__: f_med}
 
 # detrended fluctuation analysis
 

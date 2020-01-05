@@ -20,8 +20,7 @@ class FeatureGroup(FeatureBase):
 
 class FeaturesAllEHG(FeatureGroup):
     def __init__(self):
-        # super().__init__(features=[FeaturesAcharya(), FeaturesHosseinzahde(), 
-        #                            FeaturesJanjarasjitt(), FeaturesSadiAhmed(), 
-        #                            FeaturesSubramaniam(), FeaturesJager(), FeaturesFergus(),
-        #                            FeaturesTSFRESH(), FeaturesAhmed(), FeaturesRen()])
-        super().__init__(features=[FeaturesRen(), FeaturesAhmed()])
+        super().__init__(features=[FeaturesAcharya(), FeaturesHosseinzahde(), 
+                                    FeaturesJanjarasjitt(), FeaturesSadiAhmed(), 
+                                    FeaturesSubramaniam(), FeaturesJager(), FeaturesFergus(),
+                                    FeaturesTSFRESH(), FeaturesAhmed(), FeaturesRen()])

@@ -52,11 +52,11 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.linear_model import LogisticRegression
 
 dt_classifiers= [DecisionTreeClassifier(criterion="gini", max_depth=3),
-                    #DecisionTreeClassifier(criterion="gini", max_depth=5),
-                    #DecisionTreeClassifier(criterion="gini", max_depth=7),
+                    DecisionTreeClassifier(criterion="gini", max_depth=5),
+                    DecisionTreeClassifier(criterion="gini", max_depth=7),
                     DecisionTreeClassifier(criterion="entropy", max_depth=3),
-                    #DecisionTreeClassifier(criterion="entropy", max_depth=5),
-                    #DecisionTreeClassifier(criterion="entropy", max_depth=7)
+                    DecisionTreeClassifier(criterion="entropy", max_depth=5),
+                    DecisionTreeClassifier(criterion="entropy", max_depth=7)
                     ]
 
 lr_classifiers= [LogisticRegression(penalty='l2', C=0.01, fit_intercept=True, n_jobs=1),
@@ -85,30 +85,30 @@ all_classifiers= dt_classifiers + lr_classifiers
 
 samp_obj, cl_obj= sv.model_selection(dataset= dataset,
                                         samplers= [sv.polynom_fit_SMOTE,
-                                                    #sv.ProWSyn,
-                                                    #sv.SMOTE_IPF,
+                                                    sv.ProWSyn,
+                                                    sv.SMOTE_IPF,
                                                     sv.Lee,
                                                     sv.SMOBD,
-                                                    #sv.G_SMOTE,
-                                                    #sv.CCR,
-                                                    #sv.LVQ_SMOTE,
-                                                    #sv.Assembled_SMOTE,
-                                                    #sv.SMOTE_TomekLinks,
-                                                    #sv.SMOTE,
-                                                    #sv.Random_SMOTE,
-                                                    #sv.CE_SMOTE,
-                                                    #sv.SMOTE_Cosine,
-                                                    #sv.Selected_SMOTE,
-                                                    #sv.Supervised_SMOTE,
-                                                    #sv.CBSO,
-                                                    #sv.cluster_SMOTE,
-                                                    #sv.NEATER,
-                                                    #sv.NoSMOTE
+                                                    sv.G_SMOTE,
+                                                    sv.CCR,
+                                                    sv.LVQ_SMOTE,
+                                                    sv.Assembled_SMOTE,
+                                                    sv.SMOTE_TomekLinks,
+                                                    sv.SMOTE,
+                                                    sv.Random_SMOTE,
+                                                    sv.CE_SMOTE,
+                                                    sv.SMOTE_Cosine,
+                                                    sv.Selected_SMOTE,
+                                                    sv.Supervised_SMOTE,
+                                                    sv.CBSO,
+                                                    sv.cluster_SMOTE,
+                                                    sv.NEATER,
+                                                    sv.NoSMOTE
                                                     ],
-                                        classifiers= dt_classifiers,
+                                        classifiers= all_classifiers,
                                         cache_path= cache_path,
-                                        n_jobs= 1,
-                                        max_samp_par_comb= 5,
+                                        n_jobs= 5,
+                                        max_samp_par_comb= 25,
                                         random_state= 5)
 
 
@@ -118,6 +118,12 @@ samp_obj, cl_obj= sv.model_selection(dataset= dataset,
 # Oversampling and training the classifier providing the best results in the model selection procedure
 
 results= sv.read_oversampling_results([dataset], cache_path, all_results=False)
+
+results.to_csv('aggregated_results.csv')
+
+results= sv.read_oversampling_results([dataset], cache_path, all_results=True)
+
+results.to_csv('raw_results.csv')
 
 oc= sv.OversamplingClassifier(samp_obj, cl_obj)
 oc= cl_obj
