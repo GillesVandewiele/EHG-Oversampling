@@ -39,17 +39,49 @@ AUC with oversampling before partitioning: 0.9546904407849975
 
 ## Experiment 2: generating AUCs for individual features
 
-First, extract all the features using our provided script: `python3 experiments/all_features.py` to generate a file with features for each signal and channel, followed by `python3 experiments/process_feature_files.py` to create a `raw_features.csv` file with the features of the different channels joined for each signal. Finally, run `python3 generate_auc.py` (it will print out for a latex table format):
+First, extract all the features using our provided script: `python3 experiments/all_features.py` to generate a file with features for each signal and channel, followed by `python3 experiments/process_feature_files.py` to create a `raw_features.csv` file with the features of the different channels joined for each signal. Finally, run `python3 generate_auc.py`:
 
 ```
-FeaturesAcharya_aad_emd_6_FeatureFractalDimensionHigushi
-$64.5 \pm 4.8$ & $70.7 \pm 6.0$ & $58.4 \pm 7.7$ & $63.7 \pm 4.9$ & $60.3 \pm 6.7$ & $66.9 \pm 7.5$ & $59.5 \pm 5.1$ & $54.0 \pm 7.1$ & $64.7 \pm 7.3$ \\
-FeaturesHosseinzahde_aaa_emd_1_FeatureAR_Yule_Walker_0
-$37.5 \pm 4.6$ & $41.5 \pm 6.4$ & $33.4 \pm 6.1$ & $43.6 \pm 4.8$ & $46.4 \pm 6.2$ & $39.6 \pm 7.4$ & $32.3 \pm 4.0$ & $27.9 \pm 5.5$ & $37.8 \pm 5.9$ \\
-FeaturesAcharya_aaa_emd_1_FeatureSampleEntropy
-$60.1 \pm 5.2$ & $50.4 \pm 8.3$ & $65.4 \pm 5.6$ & $56.1 \pm 5.3$ & $56.2 \pm 7.1$ & $57.3 \pm 7.8$ & $69.0 \pm 4.3$ & $72.5 \pm 6.9$ & $63.5 \pm 5.7$ \\
-FeaturesAcharya_aaaa_emd_1_FeatureTeagerKaiserEnergy
-$39.9 \pm 4.9$ & $48.3 \pm 6.9$ & $31.6 \pm 6.1$ & $43.9 \pm 4.8$ & $47.4 \pm 6.0$ & $39.2 \pm 7.4$ & $35.4 \pm 4.4$ & $34.8 \pm 6.3$ & $36.2 \pm 6.4$ \\
+                                                   Channel 1 (all)           Channel 1 (early)           Channel 1 (late)          
+                                                              mean       std              mean       std             mean       std
+Feature                                                                                                                            
+FeaturesAcharya_aaa_emd_1_FeatureSampleEntropy            0.591544  0.051503          0.480708  0.095833         0.652101  0.043442
+FeaturesAcharya_aaaa_emd_1_FeatureStandardDevia...        0.401349  0.032703          0.487821  0.084913         0.326017  0.039307
+FeaturesAcharya_aaaa_emd_1_FeatureTeagerKaiserE...        0.420838  0.050610          0.460950  0.060132         0.321763  0.054654
+FeaturesAcharya_aad_emd_1_FeatureInterquartileR...        0.568805  0.051237          0.624491  0.069304         0.583167  0.048826
+FeaturesAcharya_aad_emd_6_FeatureFractalDimensi...        0.640088  0.058785          0.715739  0.062912         0.618584  0.086977
+FeaturesAhmedsampen_4_5                                   0.444810  0.040487          0.451224  0.077012         0.503737  0.085226
+FeaturesHosseinzahde_aaa_emd_1_FeatureAR_Yule_W...        0.361289  0.060995          0.416381  0.058634         0.333392  0.047579
+FeaturesJanjarasjitt_d_4_-_3                              0.447276  0.041506          0.436094  0.060452         0.423270  0.064175
+FeaturesRen_0_frequency                                   0.382981  0.026988          0.362142  0.063680         0.427883  0.110927
+FeaturesSadiAhmed_emd_6_fwl_peak_power                    0.342523  0.042130          0.361544  0.057213         0.339339  0.085714
+                                                   Channel 2 (all)           Channel 2 (early)           Channel 2 (late)          
+                                                              mean       std              mean       std             mean       std
+Feature                                                                                                                            
+FeaturesAcharya_aaa_emd_1_FeatureSampleEntropy            0.564813  0.045268          0.575717  0.043638         0.564077  0.109719
+FeaturesAcharya_aaaa_emd_1_FeatureStandardDevia...        0.464688  0.060027          0.506590  0.062906         0.379597  0.071247
+FeaturesAcharya_aaaa_emd_1_FeatureTeagerKaiserE...        0.430969  0.035297          0.464417  0.078161         0.358472  0.054636
+FeaturesAcharya_aad_emd_1_FeatureInterquartileR...        0.572280  0.050424          0.605744  0.066559         0.526313  0.050452
+FeaturesAcharya_aad_emd_6_FeatureFractalDimensi...        0.648276  0.045577          0.593505  0.064385         0.631572  0.057885
+FeaturesAhmedsampen_4_5                                   0.457637  0.035524          0.399258  0.075491         0.438623  0.063016
+FeaturesHosseinzahde_aaa_emd_1_FeatureAR_Yule_W...        0.419926  0.047405          0.458098  0.083623         0.374575  0.085831
+FeaturesJanjarasjitt_d_4_-_3                              0.471179  0.021272          0.468563  0.054219         0.463482  0.072305
+FeaturesRen_0_frequency                                   0.481301  0.052345          0.455075  0.073036         0.490442  0.081626
+FeaturesSadiAhmed_emd_6_fwl_peak_power                    0.440030  0.063030          0.446934  0.089578         0.392018  0.060133
+                                                   Channel 3 (all)           Channel 3 (early)           Channel 3 (late)          
+                                                              mean       std              mean       std             mean       std
+Feature                                                                                                                            
+FeaturesAcharya_aaa_emd_1_FeatureSampleEntropy            0.673919  0.048000          0.733307  0.051992         0.638636  0.024737
+FeaturesAcharya_aaaa_emd_1_FeatureStandardDevia...        0.352152  0.060521          0.380530  0.043683         0.382764  0.061430
+FeaturesAcharya_aaaa_emd_1_FeatureTeagerKaiserE...        0.347506  0.044559          0.340020  0.073617         0.336005  0.063156
+FeaturesAcharya_aad_emd_1_FeatureInterquartileR...        0.637819  0.029157          0.653283  0.044005         0.610691  0.088115
+FeaturesAcharya_aad_emd_6_FeatureFractalDimensi...        0.581420  0.045892          0.540443  0.074312         0.652712  0.076683
+FeaturesAhmedsampen_4_5                                   0.331351  0.051295          0.269554  0.065582         0.429794  0.063348
+FeaturesHosseinzahde_aaa_emd_1_FeatureAR_Yule_W...        0.332379  0.039977          0.283418  0.041726         0.391753  0.052815
+FeaturesJanjarasjitt_d_4_-_3                              0.358783  0.036714          0.273106  0.058694         0.449618  0.075412
+FeaturesRen_0_frequency                                   0.382948  0.050449          0.341886  0.064592         0.426213  0.061082
+FeaturesSadiAhmed_emd_6_fwl_peak_power                    0.500180  0.057612          0.498116  0.110596         0.444011  0.071167
+
 ```
 
 ## Experiment 3: reproducing results of 11 different studies
