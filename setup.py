@@ -43,7 +43,7 @@ INSTALL_REQUIRES= [
                     'nolitsa @ git+ssh://git@github.com/manu-mannattil/nolitsa.git#egg=nolitsa',
                     'entropy @ git+ssh://git@github.com/raphaelvallat/entropy.git#egg=entropy',
                     'tsfresh @ git+ssh://git@github.com/blue-yonder/tsfresh.git#egg=tsfresh',
-                    'smote_variants @ git+ssh://git@github.com/gykovacs/smote_variants.git#egg=smote_variants']
+                    'smote_variants']
 EXTRAS_REQUIRE= {'tests': ['nose'],
                  'docs': ['sphinx', 'sphinx-gallery', 'sphinx_rtd_theme', 'matplotlib', 'pandas']}
 PYTHON_REQUIRES= '>=3.5'
