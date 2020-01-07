@@ -19,9 +19,6 @@ from ehgfeatures.studies.jagerlibensek import study_jagerlibensek
 import warnings
 warnings.filterwarnings('ignore')
 
-import logging
-logging.getLogger('smote_variants').disabled = True
-
 features= pd.read_csv('output/raw_features.csv')
 target= pd.read_csv('output/target.csv', header=None, index_col=None)
 
@@ -30,14 +27,19 @@ y= target.loc[:,0]
 
 results= {}
 
-results['acharya']= study_acharya(X[[c for c in X.columns if "Acharya" in c]], y)
+X_acharya= X[[c for c in X.columns if "Acharya" in c]]
+X_acharya.to_csv('acharya.csv', index=False)
+
+results['acharya']= study_acharya(X_acharya, y)
 
 print("ACHARYA")
 for r in results['acharya']:
     if "auc" in r:
         print(r, results['acharya'][r])
 
-results['hosseinzahde']= study_hosseinzahde(X[[c for c in X.columns if "Hosseinzahde" in c and 'ch3' in c]], y)
+X_hosseinzahde= X[[c for c in X.columns if "Hosseinzahde" in c and 'ch3' in c]]
+X_hosseinzahde.to_csv('hosseinzehde.csv', index=False)
+results['hosseinzahde']= study_hosseinzahde(X_hosseinzahde, y)
 
 print("HOSSEINZAHDE")
 for r in results['hosseinzahde']:
@@ -61,7 +63,9 @@ fergus_features = [
                              ('Fergus' in c and 'LogDetector' in c and 'ch3' in c) or
                              ('Fergus' in c and 'Variance' in c and 'ch3' in c)]
 
-results['fergus']= study_fergus(X[fergus_features], y, grid=False, preprocessing=None)
+X_fergus= X[fergus_features]
+X_fergus.to_csv('fergus.csv', index=False)
+results['fergus']= study_fergus(X_fergus, y, grid=True)
 
 print("FERGUS")
 for r in results['fergus']:
@@ -88,7 +92,9 @@ fergus_features = [
 	'FeaturesJager_frms_ch3', 'FeaturesJager_sampen_ch3'
 ]
 
-results['fergus2013']= study_fergus_2013(X[[c for c in X.columns if c in fergus_features]], y)
+X_fergus2013= X[[c for c in X.columns if c in fergus_features]]
+X_fergus2013.to_csv('fergus2013.csv', index=False)
+results['fergus2013']= study_fergus_2013(X_fergus2013, y)
 
 print("FERGUS 2013")
 for r in results['fergus2013']:
@@ -104,7 +110,9 @@ idowu_features = [
 	'FeaturesJager_frms_ch3', 'FeaturesJager_sampen_ch3'
 ]
 
-results['idowu']= study_idowu(X[[c for c in X.columns if c in idowu_features]], y)
+X_idowu= X[[c for c in X.columns if c in idowu_features]]
+X_idowu.to_csv('idowu.csv', index=False)
+results['idowu']= study_idowu(X_idowu, y)
 
 print("IDOWU")
 for r in results['idowu']:
@@ -132,21 +140,27 @@ husain_features = [
 	'FeaturesJager_frms_ch3', 'FeaturesJager_sampen_ch3'
 ]
 
-results['husain']= study_hussain(X[[c for c in X.columns if c in husain_features]], y)
+X_husain= X[[c for c in X.columns if c in husain_features]]
+X_husain.to_csv('husain.csv', index=False)
+results['husain']= study_hussain(X_husain, y)
 
 print("HUSAIN")
 for r in results['husain']:
     if "auc" in r:
         print(r, results['husain'][r])
 
-results['ahmed']= study_ahmed(X[[c for c in X.columns if "FeaturesAhmed" in c]], y)
+X_ahmed= X[[c for c in X.columns if "FeaturesAhmed" in c]]
+X_ahmed.to_csv('ahmed.csv', index=False)
+results['ahmed']= study_ahmed(X_ahmed, y)
 
 print("AHMED")
 for r in results['ahmed']:
     if "auc" in r:
         print(r, results['ahmed'][r])
 
-results['ren']= study_ren(X[[c for c in X.columns if "FeaturesRen" in c]], y)
+X_ren= X[[c for c in X.columns if "FeaturesRen" in c]]
+X_ren.to_csv('ren.csv', index=False)
+results['ren']= study_ren(X_ren, y)
 
 print("REN")
 for r in results['ren']:
@@ -161,7 +175,9 @@ khan_features = [
 	'FeaturesJager_sampen_ch3',
 ]
 
-results['khan']= study_khan(X[[c for c in X.columns if c in khan_features or ('FeaturesAcharya' in c and 'SampleEntropy' in c)]], y)
+X_khan= X[[c for c in X.columns if c in khan_features or ('FeaturesAcharya' in c and 'SampleEntropy' in c)]]
+X_khan.to_csv('khan.csv', index=False)
+results['khan']= study_khan(X_khan, y)
 
 print("KHAN")
 for r in results['khan']:
@@ -185,12 +201,18 @@ peng_features = [
 	'Rectime'
 ]
 
-results['peng']= study_peng(X[[c for c in X.columns if c in peng_features or 'YuleWalker' in c]], y)
+X_peng= X[[c for c in X.columns if c in peng_features or 'YuleWalker' in c]]
+X_peng.to_csv('peng.csv', index=False)
+results['peng']= study_peng(X_peng, y)
 
 print("PENG")
 for r in results['peng']:
     if "auc" in r:
         print(r, results['peng'][r])
+
+
+features= pd.read_csv('output_jl/raw_features.csv')
+target= pd.read_csv('output_jl/target.csv', header=None, index_col=None)
 
 X= features
 y= target.loc[:,0]
@@ -203,7 +225,9 @@ clin_features= ['Rectime', 'Age', 'Parity', 'Abortions', 'Weight', 'Hypertension
                 'Funneling_None', 'Funneling_negative', 'Funneling_positive',
                 'Smoker_None', 'Smoker_no', 'Smoker_yes']
 
-results['jagerlibensek']= study_jagerlibensek(X[[c for c in X.columns if "JagerLibensek" in c or c in clin_features]], y)
+X_jagerlibensek= X[[c for c in X.columns if "JagerLibensek" in c or c in clin_features]]
+X_jagerlibensek.to_csv('jagerlibensek.csv', index=False)
+results['jagerlibensek']= study_jagerlibensek(X_jagerlibensek, y)
 
 print("JAGER-LIBENSEK")
 for r in results['jagerlibensek']:
@@ -213,9 +237,12 @@ for r in results['jagerlibensek']:
 
 all_results= pd.DataFrame(results).T
 all_results= all_results[[c for c in all_results.columns if 'auc' in c]].T
+all_results= all_results.T
+all_results.columns= ['in-samp AUC', 'incorr. os AUC', 'with os AUC', 'without os AUC']
 
 pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
 
 print(all_results)
+all_results.to_csv('all_results.csv')

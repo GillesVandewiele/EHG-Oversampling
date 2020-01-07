@@ -96,7 +96,9 @@ def study_fergus(features, target, preprocessing=StandardScaler(), grid=True, ra
     from sklearn.neural_network import MLPClassifier
     #base_classifier= RadialBasisNeuralNetworkClassifier()
     base_classifier=MLPClassifier()
-    grid_search_params= {}
+    grid_search_params= {'hidden_layer_sizes': [(100,), (50,), (200)],
+                            'activation': ['logistic', 'tanh', 'relu'],
+                            'alpha': [0.0001, 0.001, 0.01, 0.1]}
 
     # without oversampling
     classifier= base_classifier if not grid else GridSearchCV(base_classifier, grid_search_params, scoring='roc_auc')
