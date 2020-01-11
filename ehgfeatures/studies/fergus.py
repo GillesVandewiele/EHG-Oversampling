@@ -5,6 +5,7 @@ from sklearn.model_selection import StratifiedKFold, GridSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import roc_auc_score
 from sklearn.preprocessing import StandardScaler
+from sklearn.neural_network import MLPClassifier
 
 import numpy as np
 import pandas as pd
@@ -21,6 +22,31 @@ from keras.layers import Layer
 from keras import backend as K
 
 from sklearn.base import ClassifierMixin, TransformerMixin
+
+class FergusStudy(ClassifierMixin):
+    def __init__(self, grid=True, preprocessing=StandardScaler(), random_state=5):
+        self.grid= grid
+        self.preprocessing= preprocessing
+        self.random_state= random_state
+
+    def fit(self, X, y):
+        base_classifier=MLPClassifier()
+        grid_search_params= {'hidden_layer_sizes': [(100,), (50,), (200)],
+                                'activation': ['logistic', 'tanh', 'relu'],
+                                'alpha': [0.0001, 0.001, 0.01, 0.1]}
+
+        classifier= base_classifier if not self.grid else GridSearchCV(base_classifier, grid_search_params, scoring='roc_auc')
+        classifier= OversamplingClassifier(SMOTE(), classifier)
+        self.pipeline= classifier if not self.preprocessing else Pipeline([('preprocessing', self.preprocessing), ('classifier', classifier)])
+        self.pipeline.fit(X, y)
+
+        return self
+
+    def predict(self, X):
+        return self.pipeline.predict(X)
+    
+    def predict_proba(self, X):
+        return self.pipeline.predict_proba(X)
 
 def evaluate(pipeline, X, y, validator):
     preds= np.zeros((len(X), 3))

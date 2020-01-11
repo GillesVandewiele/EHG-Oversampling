@@ -15,6 +15,8 @@ import json
 
 from collections import Counter
 
+from sklearn.base import ClassifierMixin
+
 sadiahmed_features= ['FeaturesSadiAhmed_emd_3_n_peaks_ch1',
                         'FeaturesSadiAhmed_emd_3_fwh_peak_freq_ch1',
                         'FeaturesSadiAhmed_emd_3_gap_ch1',
@@ -36,6 +38,29 @@ sadiahmed_features= ['FeaturesSadiAhmed_emd_3_n_peaks_ch1',
                         'FeaturesSadiAhmed_emd_6_med_freq_ch3',
                         'FeaturesSadiAhmed_emd_6_fwh_peak_power_ch3',
                         'FeaturesSadiAhmed_emd_6_fwl_peak_power_ch3']
+
+class SadiAhmedStudy(ClassifierMixin):
+    def __init__(self, grid=True, preprocessing=StandardScaler(), random_state=5):
+        self.grid= grid
+        self.preprocessing= preprocessing
+        self.random_state= random_state
+
+    def fit(self, X, y):
+        base_classifier= SVC(kernel='linear', random_state=self.random_state, probability=True)
+        grid_search_params= {'kernel': ['linear'], 'C': [10**i for i in range(-4, 5)], 'probability': [True], 'random_state': [self.random_state]}
+
+        classifier= base_classifier if not self.grid else GridSearchCV(base_classifier, grid_search_params, scoring='roc_auc')
+        classifier= OversamplingClassifier(ADASYN(), classifier)
+        self.pipeline= classifier if not self.preprocessing else Pipeline([('preprocessing', self.preprocessing), ('classifier', classifier)])
+        self.pipeline.fit(X, y)
+
+        return self
+
+    def predict(self, X):
+        return self.pipeline.predict(X)
+    
+    def predict_proba(self, X):
+        return self.pipeline.predict_proba(X)
 
 def evaluate(pipeline, X, y, validator):
     preds= np.zeros((len(X), 3))
