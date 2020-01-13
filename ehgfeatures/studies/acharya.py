@@ -12,6 +12,43 @@ import pandas as pd
 import pyswarms as ps
 
 import json
+# acharya_features= ['FeaturesAcharya_aaaaa_emd_1_FeatureMeanAbsoluteDeviation_ch3',
+#                    'FeaturesAcharya_aaad_emd_10_FeatureSampleEntropy_ch3',
+#                    'FeaturesAcharya_aaaa_emd_1_FeatureSampleEntropy_ch3',
+#                    'FeaturesAcharya_aaad_emd_4_FeatureMeanEnergy_ch3',
+#                    'FeaturesAcharya_ad_emd_3_FeatureMeanEnergy_ch3',
+#                    'FeaturesAcharya_d_emd_7_FeatureStandardDeviation_ch3',
+#                    'FeaturesAcharya_aaaaaa_emd_3_FeatureSampleEntropy_ch3',
+#                    'FeaturesAcharya_aa_emd_2_FeatureInterquartileRange_ch3',
+#                    'FeaturesAcharya_aaaad_emd_7_FeatureTeagerKaiserEnergy_ch3',
+#                    'FeaturesAcharya_aaaaaa_emd_3_FeatureFractalDimensionHigushi_ch3']
+
+from sklearn.base import ClassifierMixin
+
+class AcharyaStudy(ClassifierMixin):
+    def __init__(self, grid=True, preprocessing=StandardScaler(), random_state=5):
+        self.grid= grid
+        self.preprocessing= preprocessing
+        self.random_state= random_state
+
+    def fit(self, X, y):
+        base_classifier= SVC(kernel='rbf', random_state=self.random_state, probability=True)
+        grid_search_params= {'kernel': ['rbf'], 'C': [10**i for i in range(-4, 5)], 'probability': [True], 'random_state': [self.random_state]}
+
+        # without oversampling
+        classifier= base_classifier if not self.grid else GridSearchCV(base_classifier, grid_search_params, scoring='accuracy')
+        classifier= OversamplingClassifier(ADASYN(), classifier)
+        self.pipeline= classifier if not self.preprocessing else Pipeline([('preprocessing', self.preprocessing), ('classifier', classifier)])
+        self.pipeline.fit(X, y)
+
+        return self
+
+    def predict(self, X):
+        return self.pipeline.predict(X)
+    
+    def predict_proba(self, X):
+        return self.pipeline.predict_proba(X)
+
 
 def evaluate(pipeline, X, y, validator):
     preds= np.zeros((len(X), 3))
@@ -28,36 +65,6 @@ def evaluate(pipeline, X, y, validator):
     preds= pd.DataFrame(preds, columns=['fold', 'label', 'prediction'])
 
     return preds
-
-
-def evaluate_pso(pipeline, X, y, validator):
-    X=X.values
-    y=y.values
-    def f_per_particle(m, alpha):
-        if np.count_nonzero(m) == 0:
-            X_subset = X
-        else:
-            X_subset = X[:,m == 1]
-        
-        pipeline.fit(X_subset, y)
-        P= (pipeline.predict(X_subset) == y).mean()
-        j= (alpha*(1.0 - P) + (1.0 - alpha)*(1 - (X_subset.shape[1]/len(X[0]))))
-
-        return j
-
-    def f(x, alpha=0.88, verbose=None):
-        n_particles= x.shape[0]
-        j= [f_per_particle(x[i], alpha) for i in range(n_particles)]
-        return np.array(j)
-        
-    options= {'c1': 0.5, 'c2': 0.5, 'w': 0.9, 'k': 30, 'p': 2}
-    dimensions= len(X[0])
-    optimizer= ps.discrete.BinaryPSO(n_particles=30, dimensions=dimensions, options=options)
-
-    cost, pos= optimizer.optimize(f, iters=100, verbose=2)
-
-    print(cost)
-    print(pos)
 
 def study_acharya(features, target, preprocessing=StandardScaler(), grid=True, random_seed=42, output_file='acharya_results.json'):
     #features= features.loc[:,acharya_features]
@@ -82,6 +89,7 @@ def study_acharya(features, target, preprocessing=StandardScaler(), grid=True, r
     classifier= base_classifier if not grid else GridSearchCV(base_classifier, grid_search_params, scoring='accuracy')
     classifier= OversamplingClassifier(ADASYN(), classifier)
     pipeline= classifier if not preprocessing else Pipeline([('preprocessing', preprocessing), ('classifier', classifier)])
+    correct_pipeline= pipeline
     validator= StratifiedKFold(n_splits=10, random_state= random_seed)
 
     preds= evaluate(classifier, features, target, validator)
@@ -107,4 +115,5 @@ def study_acharya(features, target, preprocessing=StandardScaler(), grid=True, r
     print('incorrect oversampling: ', results['incorrect_oversampling_auc'])
 
     json.dump(results, open(output_file, 'w'))
+
     return results

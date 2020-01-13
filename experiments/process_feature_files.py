@@ -17,7 +17,7 @@ from sklearn.preprocessing import StandardScaler
 
 import warnings; warnings.filterwarnings('ignore')
 
-PATH='output'
+PATH='output_jl'
 
 # Util classes & functions for feature selection
 class PipelineRFE(Pipeline):
@@ -184,8 +184,8 @@ y= feature_matrix['Rectime'] + ttb >= 37
 
 #X = X[features]
 
-X.to_csv(os.path.join(PATH, 'raw_features.csv'))
-y.to_csv(os.path.join(PATH, 'target.csv'), index=False)
+X.to_csv(os.path.join(PATH, 'raw_features_jl.csv'))
+y.to_csv(os.path.join(PATH, 'target_jl.csv'), index=False)
 
 # Apply first feature selection by removing highly correlated features
 useless_features = remove_features(feature_matrix)
@@ -193,4 +193,7 @@ feature_matrix = feature_matrix.drop(useless_features, axis=1)
 
 # Create our X and our y (term/preterm)
 X = feature_matrix.reset_index(drop=True)
-X.to_csv(os.path.join(PATH, 'cleaned_features.csv'))
+#y = feature_matrix['Rectime'] + ttb >= 37
+
+X.to_csv(os.path.join(PATH, 'cleaned_features_jl.csv'))
+#y.to_csv(os.path.join(PATH, 'target.csv'), index=False)

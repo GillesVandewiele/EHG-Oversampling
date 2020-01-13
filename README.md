@@ -96,7 +96,3 @@ incorrect_oversampling_auc   0.967071  0.855769  0.986538  0.917242
 with_oversampling_auc         0.59747  0.238255  0.815436  0.468076
 without_oversampling_auc      0.44332  0.875839  0.832215  0.568684
 ```
-
-## Experiment 4: impact of oversampling
-
-Run `python3 examples/oversampling_analysis.py`

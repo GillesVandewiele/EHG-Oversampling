@@ -6,6 +6,6 @@ git+https://github.com/laszukdawid/PyEMD.git
 git+https://github.com/manu-mannattil/nolitsa.git
 git+https://github.com/raphaelvallat/entropy.git
 git+https://github.com/blue-yonder/tsfresh.git
-git+https://github.com/gykovacs/smote_variants.git
+smote_variants
 PyWavelets
 neurokit

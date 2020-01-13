@@ -15,6 +15,31 @@ import pyswarms as ps
 
 import json
 
+from sklearn.base import ClassifierMixin, TransformerMixin
+
+class JagerLibensekStudy(ClassifierMixin):
+    def __init__(self, grid=True, preprocessing=StandardScaler(), random_state=5):
+        self.grid= grid
+        self.preprocessing= preprocessing
+        self.random_state= random_state
+
+    def fit(self, X, y):
+        base_classifier= QuadraticDiscriminantAnalysis()
+        grid_search_params= {'reg_param': [0.01, 0.1, 0.5, 0.9, 0.99]}
+
+        classifier= base_classifier if not self.grid else GridSearchCV(base_classifier, grid_search_params, scoring='roc_auc')
+        classifier= OversamplingClassifier(ADASYN(), classifier)
+        self.pipeline= classifier if not self.preprocessing else Pipeline([('preprocessing', self.preprocessing), ('classifier', classifier)])
+        self.pipeline.fit(X, y)
+
+        return self
+
+    def predict(self, X):
+        return self.pipeline.predict(X)
+    
+    def predict_proba(self, X):
+        return self.pipeline.predict_proba(X)
+
 def evaluate(pipeline, X, y, validator):
     preds= np.zeros((len(X), 3))
     for fold_idx, (train_idx, test_idx) in enumerate(validator.split(X, y)):

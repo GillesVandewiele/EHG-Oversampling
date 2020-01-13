@@ -7,7 +7,7 @@ from collections import defaultdict
 import glob
 
 
-def bootstrap_auc(y, x, repeat=10):
+def bootstrap_auc(y, x, repeat=10000):
     aucs = []
     for _ in range(repeat):
         sampled_ix = np.random.choice(range(len(x)), replace=True, size=len(x))
