@@ -4,7 +4,7 @@ import codecs
 from setuptools import setup, find_packages
 
 def readme():
-    with codecs.open('README.rst', encoding='utf-8-sig') as f:
+    with codecs.open('README.md', encoding='utf-8-sig') as f:
         return f.read()
 
 version_file= os.path.join('ehgfeatures', '_version.py')

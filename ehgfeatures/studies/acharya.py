@@ -13,17 +13,6 @@ import pyswarms as ps
 
 import json
 
-# acharya_features= ['FeaturesAcharya_aaaaa_emd_1_FeatureMeanAbsoluteDeviation_ch3',
-#                    'FeaturesAcharya_aaad_emd_10_FeatureSampleEntropy_ch3',
-#                    'FeaturesAcharya_aaaa_emd_1_FeatureSampleEntropy_ch3',
-#                    'FeaturesAcharya_aaad_emd_4_FeatureMeanEnergy_ch3',
-#                    'FeaturesAcharya_ad_emd_3_FeatureMeanEnergy_ch3',
-#                    'FeaturesAcharya_d_emd_7_FeatureStandardDeviation_ch3',
-#                    'FeaturesAcharya_aaaaaa_emd_3_FeatureSampleEntropy_ch3',
-#                    'FeaturesAcharya_aa_emd_2_FeatureInterquartileRange_ch3',
-#                    'FeaturesAcharya_aaaad_emd_7_FeatureTeagerKaiserEnergy_ch3',
-#                    'FeaturesAcharya_aaaaaa_emd_3_FeatureFractalDimensionHigushi_ch3']
-
 def evaluate(pipeline, X, y, validator):
     preds= np.zeros((len(X), 3))
     for fold_idx, (train_idx, test_idx) in enumerate(validator.split(X, y)):
@@ -83,7 +72,8 @@ def study_acharya(features, target, preprocessing=StandardScaler(), grid=True, r
     validator= StratifiedKFold(n_splits=10, random_state= random_seed)
 
     preds= evaluate(pipeline, features, target, validator)
-    results['without_oversampling_auc']= accuracy_score(preds['label'].values, preds['prediction'].values > 0.5)
+    results['without_oversampling_acc']= accuracy_score(preds['label'].values, preds['prediction'].values > 0.5)
+    results['without_oversampling_auc']= roc_auc_score(preds['label'].values, preds['prediction'].values)
     results['without_oversampling_details']= preds.to_dict()
 
     print('without oversampling: ', results['without_oversampling_auc'])
@@ -95,17 +85,10 @@ def study_acharya(features, target, preprocessing=StandardScaler(), grid=True, r
     validator= StratifiedKFold(n_splits=10, random_state= random_seed)
 
     preds= evaluate(classifier, features, target, validator)
-    results['with_oversampling_auc']= accuracy_score(preds['label'].values, preds['prediction'].values > 0.5)
+    results['with_oversampling_acc']= accuracy_score(preds['label'].values, preds['prediction'].values > 0.5)
+    results['with_oversampling_auc']= roc_auc_score(preds['label'].values, preds['prediction'].values)
     results['with_oversampling_details']= preds.to_dict()
     print('with oversampling: ', results['with_oversampling_auc'])
-
-    # in-sample evaluation
-    classifier= base_classifier
-    preds= classifier.fit(features.values, target.values).predict_proba(features.values)[:,1]
-    preds= pd.DataFrame({'fold': 0, 'label': target.values, 'prediction': preds})
-    results['in_sample_auc']= accuracy_score(preds['label'].values, preds['prediction'].values > 0.5)
-    results['in_sample_details']= preds.to_dict()
-    print('in sample: ', results['in_sample_auc'])
 
     # with incorrect oversampling
     X, y= ADASYN().sample(features.values, target.values)
@@ -117,8 +100,10 @@ def study_acharya(features, target, preprocessing=StandardScaler(), grid=True, r
     validator= StratifiedKFold(n_splits=10, random_state= random_seed)
 
     preds= evaluate(pipeline, X, y, validator)
-    results['incorrect_oversampling_auc']= accuracy_score(preds['label'].values, preds['prediction'].values > 0.5)
+    results['incorrect_oversampling_acc']= accuracy_score(preds['label'].values, preds['prediction'].values > 0.5)
+    results['incorrect_oversampling_auc']= roc_auc_score(preds['label'].values, preds['prediction'].values)
     results['incorrect_oversampling_details']= preds.to_dict()
+    
     print('incorrect oversampling: ', results['incorrect_oversampling_auc'])
 
     json.dump(results, open(output_file, 'w'))

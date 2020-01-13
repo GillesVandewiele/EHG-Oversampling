@@ -55,6 +55,7 @@ FeaturesHosseinzahde_aaa_emd_1_FeatureAR_Yule_W...        0.361289  0.060995    
 FeaturesJanjarasjitt_d_4_-_3                              0.447276  0.041506          0.436094  0.060452         0.423270  0.064175
 FeaturesRen_0_frequency                                   0.382981  0.026988          0.362142  0.063680         0.427883  0.110927
 FeaturesSadiAhmed_emd_6_fwl_peak_power                    0.342523  0.042130          0.361544  0.057213         0.339339  0.085714
+
                                                    Channel 2 (all)           Channel 2 (early)           Channel 2 (late)          
                                                               mean       std              mean       std             mean       std
 Feature                                                                                                                            
@@ -68,6 +69,7 @@ FeaturesHosseinzahde_aaa_emd_1_FeatureAR_Yule_W...        0.419926  0.047405    
 FeaturesJanjarasjitt_d_4_-_3                              0.471179  0.021272          0.468563  0.054219         0.463482  0.072305
 FeaturesRen_0_frequency                                   0.481301  0.052345          0.455075  0.073036         0.490442  0.081626
 FeaturesSadiAhmed_emd_6_fwl_peak_power                    0.440030  0.063030          0.446934  0.089578         0.392018  0.060133
+
                                                    Channel 3 (all)           Channel 3 (early)           Channel 3 (late)          
                                                               mean       std              mean       std             mean       std
 Feature                                                                                                                            
@@ -81,7 +83,6 @@ FeaturesHosseinzahde_aaa_emd_1_FeatureAR_Yule_W...        0.332379  0.039977    
 FeaturesJanjarasjitt_d_4_-_3                              0.358783  0.036714          0.273106  0.058694         0.449618  0.075412
 FeaturesRen_0_frequency                                   0.382948  0.050449          0.341886  0.064592         0.426213  0.061082
 FeaturesSadiAhmed_emd_6_fwl_peak_power                    0.500180  0.057612          0.498116  0.110596         0.444011  0.071167
-
 ```
 
 ## Experiment 3: reproducing results of 11 different studies
@@ -89,7 +90,11 @@ FeaturesSadiAhmed_emd_6_fwl_peak_power                    0.500180  0.057612    
 Make sure the features are extracted and joined using `all_features.py` and `process_feature_files.py`. Then, run `python3 examples/studies.py`
 
 ```
-
+                           fergus2013    husain      khan      peng
+in_sample_auc                0.998988  0.872483  0.872483  0.999447
+incorrect_oversampling_auc   0.967071  0.855769  0.986538  0.917242
+with_oversampling_auc         0.59747  0.238255  0.815436  0.468076
+without_oversampling_auc      0.44332  0.875839  0.832215  0.568684
 ```
 
 ## Experiment 4: impact of oversampling

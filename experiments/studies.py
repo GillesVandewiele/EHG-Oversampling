@@ -30,43 +30,43 @@ y= target.loc[:,0]
 
 results= {}
 
-results['acharya']= study_acharya(X[[c for c in X.columns if "Acharya" in c]], y)
+# results['acharya']= study_acharya(X[[c for c in X.columns if "Acharya" in c]], y)
 
-print("ACHARYA")
-for r in results['acharya']:
-    if "auc" in r:
-        print(r, results['acharya'][r])
+# print("ACHARYA")
+# for r in results['acharya']:
+#     if "auc" in r:
+#         print(r, results['acharya'][r])
 
-results['hosseinzahde']= study_hosseinzahde(X[[c for c in X.columns if "Hosseinzahde" in c and 'ch3' in c]], y)
+# results['hosseinzahde']= study_hosseinzahde(X[[c for c in X.columns if "Hosseinzahde" in c and 'ch3' in c]], y)
 
-print("HOSSEINZAHDE")
-for r in results['hosseinzahde']:
-    if "auc" in r:
-        print(r, results['hosseinzahde'][r])
+# print("HOSSEINZAHDE")
+# for r in results['hosseinzahde']:
+#     if "auc" in r:
+#         print(r, results['hosseinzahde'][r])
 
-fergus_features = [
- 	'Hypertension_None', 'Hypertension_no',
- 	'Hypertension_yes', 'Diabetes_None',
- 	'Diabetes_no', 'Diabetes_yes',
- 	'Placental_position_None', 'Placental_position_end',
- 	'Placental_position_front', 'Bleeding_first_trimester_None',
- 	'Bleeding_first_trimester_no', 'Bleeding_first_trimester_yes',
- 	'Bleeding_second_trimester_None', 'Bleeding_second_trimester_no',
- 	'Bleeding_second_trimester_yes', 'Funneling_None',
- 	'Funneling_negative', 'Funneling_positive',
- 	'Smoker_None', 'Smoker_no', 'Smoker_yes',
- 	'Weight', 'Rectime', 'Age', 'Parity', 'Abortions'
-] + [c for c in X.columns if (c == 'FeaturesJager_sampen_ch3') or
-                             ('Fergus' in c and 'WaveletLength' in c and 'ch3' in c) or
-                             ('Fergus' in c and 'LogDetector' in c and 'ch3' in c) or
-                             ('Fergus' in c and 'Variance' in c and 'ch3' in c)]
+# fergus_features = [
+#  	'Hypertension_None', 'Hypertension_no',
+#  	'Hypertension_yes', 'Diabetes_None',
+#  	'Diabetes_no', 'Diabetes_yes',
+#  	'Placental_position_None', 'Placental_position_end',
+#  	'Placental_position_front', 'Bleeding_first_trimester_None',
+#  	'Bleeding_first_trimester_no', 'Bleeding_first_trimester_yes',
+#  	'Bleeding_second_trimester_None', 'Bleeding_second_trimester_no',
+#  	'Bleeding_second_trimester_yes', 'Funneling_None',
+#  	'Funneling_negative', 'Funneling_positive',
+#  	'Smoker_None', 'Smoker_no', 'Smoker_yes',
+#  	'Weight', 'Rectime', 'Age', 'Parity', 'Abortions'
+# ] + [c for c in X.columns if (c == 'FeaturesJager_sampen_ch3') or
+#                              ('Fergus' in c and 'WaveletLength' in c and 'ch3' in c) or
+#                              ('Fergus' in c and 'LogDetector' in c and 'ch3' in c) or
+#                              ('Fergus' in c and 'Variance' in c and 'ch3' in c)]
 
-results['fergus']= study_fergus(X[fergus_features], y, grid=False, preprocessing=None)
+# results['fergus']= study_fergus(X[fergus_features], y, grid=False, preprocessing=None)
 
-print("FERGUS")
-for r in results['fergus']:
-    if "auc" in r:
-        print(r, results['fergus'][r])
+# print("FERGUS")
+# for r in results['fergus']:
+#     if "auc" in r:
+#         print(r, results['fergus'][r])
 
 fergus_features = [
 	'Hypertension_None', 'Hypertension_no',
@@ -95,21 +95,21 @@ for r in results['fergus2013']:
     if "auc" in r:
         print(r, results['fergus2013'][r])
 
-idowu_features = [
-	'FeaturesJager_fmed_ch1', 'FeaturesJager_fpeak_ch1', 
-	'FeaturesJager_frms_ch1', 'FeaturesJager_sampen_ch1',
-	'FeaturesJager_fmed_ch2', 'FeaturesJager_fpeak_ch2', 
-	'FeaturesJager_frms_ch2', 'FeaturesJager_sampen_ch2',
-	'FeaturesJager_fmed_ch3', 'FeaturesJager_fpeak_ch3', 
-	'FeaturesJager_frms_ch3', 'FeaturesJager_sampen_ch3'
-]
+# idowu_features = [
+# 	'FeaturesJager_fmed_ch1', 'FeaturesJager_fpeak_ch1', 
+# 	'FeaturesJager_frms_ch1', 'FeaturesJager_sampen_ch1',
+# 	'FeaturesJager_fmed_ch2', 'FeaturesJager_fpeak_ch2', 
+# 	'FeaturesJager_frms_ch2', 'FeaturesJager_sampen_ch2',
+# 	'FeaturesJager_fmed_ch3', 'FeaturesJager_fpeak_ch3', 
+# 	'FeaturesJager_frms_ch3', 'FeaturesJager_sampen_ch3'
+# ]
 
-results['idowu']= study_idowu(X[[c for c in X.columns if c in idowu_features]], y)
+# results['idowu']= study_idowu(X[[c for c in X.columns if c in idowu_features]], y)
 
-print("IDOWU")
-for r in results['idowu']:
-    if "auc" in r:
-        print(r, results['idowu'][r])
+# print("IDOWU")
+# for r in results['idowu']:
+#     if "auc" in r:
+#         print(r, results['idowu'][r])
 
 
 husain_features = [
@@ -139,19 +139,19 @@ for r in results['husain']:
     if "auc" in r:
         print(r, results['husain'][r])
 
-results['ahmed']= study_ahmed(X[[c for c in X.columns if "FeaturesAhmed" in c]], y)
+# results['ahmed']= study_ahmed(X[[c for c in X.columns if "FeaturesAhmed" in c]], y)
 
-print("AHMED")
-for r in results['ahmed']:
-    if "auc" in r:
-        print(r, results['ahmed'][r])
+# print("AHMED")
+# for r in results['ahmed']:
+#     if "auc" in r:
+#         print(r, results['ahmed'][r])
 
-results['ren']= study_ren(X[[c for c in X.columns if "FeaturesRen" in c]], y)
+# results['ren']= study_ren(X[[c for c in X.columns if "FeaturesRen" in c]], y)
 
-print("REN")
-for r in results['ren']:
-    if "auc" in r:
-        print(r, results['ren'][r])
+# print("REN")
+# for r in results['ren']:
+#     if "auc" in r:
+#         print(r, results['ren'][r])
 
 khan_features = [
 	'FeaturesJager_fmed_ch1', 'FeaturesJager_lyap_ch1', 
@@ -212,7 +212,7 @@ for r in results['jagerlibensek']:
 
 
 all_results= pd.DataFrame(results).T
-all_results= all_results[[c for c in all_results.columns if 'auc' in c]].T
+all_results= all_results[[c for c in all_results.columns if 'auc' in c or 'acc' in c]].T
 
 pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
