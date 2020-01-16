@@ -32,7 +32,11 @@ CLASSIFIERS= [  'Intended Audience :: Science/Research',
                 'Operating System :: POSIX',
                 'Operating System :: Unix',
                 'Operating System :: MacOS']
-INSTALL_REQUIRES= [
+on_rtd = os.environ.get('READTHEDOCS') == 'True'
+if on_rtd:
+    INSTALL_REQUIRES = []
+else:
+    INSTALL_REQUIRES= [
                     'numpy', 
                     'wfdb', 
                     'pandas', 
