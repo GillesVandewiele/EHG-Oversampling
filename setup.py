@@ -32,22 +32,6 @@ CLASSIFIERS= [  'Intended Audience :: Science/Research',
                 'Operating System :: POSIX',
                 'Operating System :: Unix',
                 'Operating System :: MacOS']
-on_rtd = os.environ.get('READTHEDOCS') == 'True'
-if on_rtd:
-    INSTALL_REQUIRES = []
-else:
-    INSTALL_REQUIRES= [
-                    'numpy', 
-                    'wfdb', 
-                    'pandas', 
-                    'scipy', 
-                    'PyWavelets', 
-                    'neurokit', 
-                    'PyEMD @ git+ssh://git@github.com/laszukdawid/PyEMD.git#egg=PyEMD', 
-                    'nolitsa @ git+ssh://git@github.com/manu-mannattil/nolitsa.git#egg=nolitsa',
-                    'entropy @ git+ssh://git@github.com/raphaelvallat/entropy.git#egg=entropy',
-                    'tsfresh @ git+ssh://git@github.com/blue-yonder/tsfresh.git#egg=tsfresh',
-                    'smote_variants']
 EXTRAS_REQUIRE= {'tests': ['nose'],
                  'docs': ['sphinx', 'sphinx-gallery', 'sphinx_rtd_theme', 'matplotlib', 'pandas']}
 PYTHON_REQUIRES= '>=3.5'
@@ -70,7 +54,21 @@ setup(name=DISTNAME,
       long_description_content_type=LONG_DESCRIPTION_CONTENT_TYPE,
       zip_safe=False,
       classifiers=CLASSIFIERS,
-      install_requires=INSTALL_REQUIRES,
+      install_requires=['numpy', 
+                    'wfdb', 
+                    'pandas', 
+                    'scipy', 
+                    'PyWavelets', 
+                    'neurokit', 
+                    'PyEMD', 
+                    'entropy',
+                    'tsfresh',
+                    #'nolitsa',
+                    'smote_variants'],
+      dependency_links=['http://github.com/laszukdawid/PyEMD.git#egg=PyEMD',
+                        #'http://github.com/manu-mannattil/nolitsa#egg=nolitsa',
+                        'http://github.com/raphaelvallat/entropy.git#egg=entropy',
+                        'http://github.com/git@github.com/blue-yonder/tsfresh.git#egg=tsfresh'],
       extras_require=EXTRAS_REQUIRE,
       python_requires=PYTHON_REQUIRES,
       test_suite=TEST_SUITE,
